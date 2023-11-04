@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://bgk0aqoulxw6j"]
+
+[ext_resource type="Script" path="res://scenes/characters/quarry/quarry.gd" id="1_kjeg4"]
+[ext_resource type="Texture2D" uid="uid://cxmuhvwanjc45" path="res://scenes/characters/quarry/quarry.png" id="2_hkus0"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6tieq"]
+radius = 6.0
+
+[node name="Quarry" type="CharacterBody2D"]
+script = ExtResource("1_kjeg4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_6tieq")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_hkus0")

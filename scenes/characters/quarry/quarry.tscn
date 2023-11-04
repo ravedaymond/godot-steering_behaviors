@@ -1,0 +1,134 @@
+[gd_scene load_steps=15 format=3 uid="uid://bgk0aqoulxw6j"]
+
+[ext_resource type="Script" path="res://scenes/characters/quarry/quarry.gd" id="1_kjeg4"]
+[ext_resource type="Texture2D" uid="uid://cxmuhvwanjc45" path="res://scenes/characters/quarry/quarry.png" id="2_hkus0"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6tieq"]
+radius = 6.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8g5x4"]
+atlas = ExtResource("2_hkus0")
+region = Rect2(0, 12, 13, 12)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u0615"]
+atlas = ExtResource("2_hkus0")
+region = Rect2(13, 12, 13, 12)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r2rxs"]
+atlas = ExtResource("2_hkus0")
+region = Rect2(26, 12, 13, 12)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gts4t"]
+atlas = ExtResource("2_hkus0")
+region = Rect2(39, 12, 13, 12)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_00yp3"]
+atlas = ExtResource("2_hkus0")
+region = Rect2(52, 12, 13, 12)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wgxm2"]
+atlas = ExtResource("2_hkus0")
+region = Rect2(65, 12, 13, 12)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y676k"]
+atlas = ExtResource("2_hkus0")
+region = Rect2(0, 0, 13, 12)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_cbviq"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8g5x4")
+}],
+"loop": true,
+"name": &"1",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_u0615")
+}],
+"loop": true,
+"name": &"2",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r2rxs")
+}],
+"loop": true,
+"name": &"3",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gts4t")
+}],
+"loop": true,
+"name": &"4",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_00yp3")
+}],
+"loop": true,
+"name": &"5",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wgxm2")
+}],
+"loop": true,
+"name": &"6",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y676k")
+}],
+"loop": true,
+"name": &"default",
+"speed": 0.0
+}]
+
+[sub_resource type="LabelSettings" id="LabelSettings_4jtkc"]
+font_size = 12
+font_color = Color(0.639216, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_od1u4"]
+font_size = 12
+font_color = Color(0.0980392, 0, 0.772549, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_fv367"]
+font_size = 12
+font_color = Color(0.00784314, 0.509804, 0, 1)
+
+[node name="Quarry" type="CharacterBody2D"]
+script = ExtResource("1_kjeg4")
+use_mouse_as_target = true
+velocity_speed_max = 75.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_6tieq")
+debug_color = Color(0, 0.6, 0.701961, 0)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_cbviq")
+
+[node name="VectorLabels" type="VBoxContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 59.0
+
+[node name="Desired" type="Label" parent="VectorLabels"]
+layout_mode = 2
+label_settings = SubResource("LabelSettings_4jtkc")
+
+[node name="Steering" type="Label" parent="VectorLabels"]
+layout_mode = 2
+label_settings = SubResource("LabelSettings_od1u4")
+
+[node name="Velocity" type="Label" parent="VectorLabels"]
+layout_mode = 2
+label_settings = SubResource("LabelSettings_fv367")

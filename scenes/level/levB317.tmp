@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://g4lwk5ek5jde"]
+
+[ext_resource type="Script" path="res://scenes/levels/level_.gd" id="1_kjw32"]
+[ext_resource type="PackedScene" uid="uid://hula6wxnfcjq" path="res://scenes/camera/camera.tscn" id="1_ocd16"]
+[ext_resource type="PackedScene" uid="uid://bttetwdvp3d27" path="res://scenes/boids/boid.tscn" id="2_k05n4"]
+
+[node name="Level" type="Node2D"]
+script = ExtResource("1_kjw32")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = -10
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.105882, 0.121569, 0.129412, 1)
+
+[node name="Camera" parent="." instance=ExtResource("1_ocd16")]
+
+[node name="Boid" parent="." instance=ExtResource("2_k05n4")]

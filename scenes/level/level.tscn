@@ -1,0 +1,46 @@
+[gd_scene load_steps=5 format=3 uid="uid://g4lwk5ek5jde"]
+
+[ext_resource type="Script" path="res://scenes/level/level.gd" id="1_q5sdl"]
+[ext_resource type="PackedScene" uid="uid://hula6wxnfcjq" path="res://scenes/camera/camera.tscn" id="2_jw2g1"]
+[ext_resource type="PackedScene" uid="uid://bttetwdvp3d27" path="res://scenes/characters/boids/boid.tscn" id="3_4fvya"]
+[ext_resource type="PackedScene" uid="uid://bgk0aqoulxw6j" path="res://scenes/characters/quarry/quarry.tscn" id="4_adlrg"]
+
+[node name="Level" type="Node2D"]
+script = ExtResource("1_q5sdl")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = -10
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0)
+
+[node name="Camera2D" parent="." instance=ExtResource("2_jw2g1")]
+visible = false
+
+[node name="Boids" type="Node" parent="."]
+
+[node name="Boid" parent="Boids" instance=ExtResource("3_4fvya")]
+position = Vector2(-15, 103)
+
+[node name="Boid2" parent="Boids" instance=ExtResource("3_4fvya")]
+position = Vector2(54, 124)
+behavior = 3
+
+[node name="Boid3" parent="Boids" instance=ExtResource("3_4fvya")]
+position = Vector2(-94, 169)
+
+[node name="Boid4" parent="Boids" instance=ExtResource("3_4fvya")]
+position = Vector2(140, 195)
+behavior = 3
+
+[node name="Quarry" type="Node" parent="."]
+
+[node name="Quarry" parent="Quarry" instance=ExtResource("4_adlrg")]
+behavior = 5
+
+[node name="Beacons" type="Node" parent="."]

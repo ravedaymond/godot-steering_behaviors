@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://bdtfgi71cdo08"]
+
+[ext_resource type="Script" path="res://scenes/characters/beacons/beacon.gd" id="1_4j76f"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ytia5"]
+
+[node name="Beacon" type="StaticBody2D"]
+collision_layer = 2
+script = ExtResource("1_4j76f")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_ytia5")
+debug_color = Color(0, 0.6, 0.701961, 0)
