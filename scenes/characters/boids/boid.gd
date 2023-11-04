@@ -11,7 +11,8 @@ enum Behavior {
 	ARRIVAL,
 	PURSUE_OFFSET,
 	OBSTACLE_AVOIDANCE,
-	WANDER,
+	WANDER_RANDOM,
+	WANDER_REYNOLDS,
 	PATH_FOLLOWING,
 	WALL_FOLLOWING,
 	CONTAINMENT,
@@ -25,31 +26,45 @@ enum Type {
 	DEFENSIVE,
 }
 
+@export var behavior: Behavior = Behavior.STATIC
 @export var use_mouse_as_target: bool = false
 @export var use_intervals: bool = false
 @export var velocity_speed: float = 0.0
 @export var velocity_speed_max: float = 50.0
 @export var velocity_acceleration: float = 1.0
 var velocity_desired: Vector2
+var velocity_modifier: Vector2
 @export var steering_force: float = 0.0
 @export var steering_force_max: float = 2.0
 @export var steering_intensity: float = 0.01
 var steering_vector: Vector2
-var velocity_modifier: Vector2
-
+@export_subgroup("Pursue", "pursue_")
 @export var pursue_future_multiplier: float = 10.0
+var pursue_vector: Vector2 = Vector2.ZERO
+@export_subgroup("Evade", "evade_")
 @export var evade_future_multiplier: float = 10.0
-var pursue_vector: Vector2
-var evade_vector: Vector2
+var evade_vector: Vector2 = Vector2.ZERO
+@export_subgroup("Arrival", "arrival_")
 @export var arrival_slowing_distance: float = 50.0
 var arrival_distance_vector: Vector2
 var arrival_distance_length: float
 var arrival_ramped_speed: float
 var arrival_clipped_speed: float
+@export_subgroup("Wander", "wander_")
+@export var wander_random_distance: float = 100.0
+@export var wander_reynolds_distance: float = 50.0
+@export var wander_reynolds_strength: float = 20.0
+@export var wander_timer_wait_time: float = 0.50
+var wander_timer: Timer = add_wander_timer(wander_timer_wait_time)
+var wander_reynolds_target: Vector2
+var wander_reynolds_angle: Vector2
+@export_subgroup("Debugging", "debug_")
+@export var debug_enabled: bool = true
+@export var debug_draw_labels: bool = true
+@export var debug_draw_vectors: bool = true
 
-var target: Variant
+var target: Node2D
 var type: Type
-@export var behavior: Behavior = Behavior.STATIC
 
 func _init():
 	add_to_group(Main.Groups.BOIDS)
@@ -76,7 +91,6 @@ func _physics_process(_delta):
 		velocity_speed = clampf(velocity_speed+velocity_acceleration, 0, velocity_speed_max)
 		steering_force = clampf(steering_force+steering_intensity, 0, steering_force_max)
 	decide_on_target()
-	
 	match(behavior):
 		Behavior.SEEK:
 			velocity_modifier += behavior_seek(target.global_position)
@@ -88,6 +102,10 @@ func _physics_process(_delta):
 			velocity_modifier += behavior_evade(target, pursue_future_multiplier)
 		Behavior.ARRIVAL:
 			velocity_modifier += behavior_arrival(target.global_position)
+		Behavior.WANDER_RANDOM:
+			velocity_modifier += behavior_wander_random()
+		Behavior.WANDER_REYNOLDS:
+			velocity_modifier += behavior_wander_reynolds()
 		_:
 			behavior = Behavior.STATIC
 	
@@ -102,12 +120,17 @@ func _physics_process(_delta):
 
 
 func _draw():
+	if(!debug_draw_vectors): return
 	if(target):
-		draw_line(Vector2.ZERO, to_local(target.global_position), Color.DIM_GRAY, 1.0, false)
 		if(pursue_vector != Vector2.ZERO):
 			draw_line(Vector2.ZERO, to_local(pursue_vector), Color.DIM_GRAY, 1.0, false)
 		if(evade_vector != Vector2.ZERO):
 			draw_line(Vector2.ZERO, to_local(evade_vector), Color.DIM_GRAY, 1.0, false)
+		if(behavior == Behavior.WANDER_REYNOLDS):
+#			draw_line(Vector2.ZERO, to_local())
+#			draw_arc(target.global_position, wander_reynolds_strength, 0, 360, 13, Color.DIM_GRAY, 1.0, false)
+			draw_circle(to_local(wander_reynolds_target), wander_reynolds_strength, Color.DIM_GRAY)
+		draw_line(Vector2.ZERO, to_local(target.global_position), Color.WEB_GRAY, 1.0, false)
 	draw_set_transform(Vector2.ZERO, -rotation)
 	draw_line(velocity, velocity_desired, Color.DIM_GRAY, 1.0, false)
 	draw_line(Vector2.ZERO, velocity_desired, Color.RED, 1.0, false)
@@ -116,13 +139,18 @@ func _draw():
 
 
 func debug_labels(rotation: float):
-	$VectorLabels.rotation = -rotation
-#	$Velocity.global_position = global_position
-	$VectorLabels/Velocity.text = "V"+str(velocity)
-#	$Desired.global_position = global_position+velocity_desired
-	$VectorLabels/Desired.text = "D"+str(velocity_desired)
-#	$Steering.global_position = global_position+velocity
-	$VectorLabels/Steering.text = "S"+str(steering_vector)
+	if(debug_draw_labels):
+		$VectorLabels.rotation = -rotation
+	#	$Velocity.global_position = global_position
+		$VectorLabels/Velocity.text = "V"+str(velocity)
+	#	$Desired.global_position = global_position+velocity_desired
+		$VectorLabels/Desired.text = "D"+str(velocity_desired)
+	#	$Steering.global_position = global_position+velocity
+		$VectorLabels/Steering.text = "S"+str(steering_vector)
+	else:
+		$VectorLabels/Velocity.text = ""
+		$VectorLabels/Desired.text = ""
+		$VectorLabels/Steering.text = ""
 
 
 func decide_on_target():
@@ -130,7 +158,6 @@ func decide_on_target():
 		target = Node2D.new()
 		target.global_position = global_position
 	if(use_mouse_as_target):
-		target = Node2D.new()
 		target.global_position = get_global_mouse_position()
 		return
 	var group = Main.LEVEL.get_node(Main.Groups.QUARRY)
@@ -154,8 +181,8 @@ func decide_on_target():
 # Does not handle collision detection and can cause physic wonkyness when
 #	bumping into other moving objects.
 func behavior_seek(target: Vector2) -> Vector2:
-	if(behavior != Behavior.PURSUE): 
-		behavior = Behavior.SEEK
+#	if(behavior != Behavior.PURSUE): 
+#		behavior = Behavior.SEEK
 	velocity_desired = (target - position).normalized()*velocity_speed
 	steering_vector = (velocity_desired - velocity).limit_length(steering_force)
 	return steering_vector
@@ -163,8 +190,8 @@ func behavior_seek(target: Vector2) -> Vector2:
 
 # Apply steering force towards a direct path away from the target.
 func behavior_flee(target: Vector2) -> Vector2:
-	if(behavior != Behavior.EVADE): 
-		behavior = Behavior.FLEE
+#	if(behavior != Behavior.EVADE): 
+#		behavior = Behavior.FLEE
 	velocity_desired = (position - target).limit_length(velocity_speed)
 	steering_vector = (velocity_desired - velocity).limit_length(steering_force)
 	return steering_vector
@@ -221,8 +248,34 @@ func behavior_obstacle_avoidance() -> Vector2:
 	return steering_vector
 
 
-func behavior_wander() -> Vector2:
-	return steering_vector
+func behavior_wander_random() -> Vector2:
+	if(!find_child(wander_timer.name, false, false)):
+		add_child(wander_timer)
+	if(wander_timer.is_stopped()):
+		var x = randi_range(-wander_random_distance, wander_random_distance)
+		var y = randi_range(-wander_random_distance, wander_random_distance)
+		target.global_position = global_position+Vector2(x, y)
+		wander_timer.start()
+	return behavior_seek(target.global_position)
+
+
+func behavior_wander_reynolds() -> Vector2:
+	if(!find_child(wander_timer.name, false, false)):
+		add_child(wander_timer)
+	wander_reynolds_target = position+velocity.normalized()*wander_reynolds_distance
+	if(wander_timer.is_stopped()):
+		wander_reynolds_angle = Vector2.from_angle(randf()*360)
+		wander_timer.start()
+	target.global_position = wander_reynolds_target+wander_reynolds_angle*wander_reynolds_strength
+	return behavior_seek(target.global_position)
+
+
+func add_wander_timer(wait_time: float) -> Timer:
+	var timer = Timer.new()
+	timer.name = "WanderTimer"
+	timer.one_shot = true
+	timer.wait_time = wait_time
+	return timer
 
 
 func path_following() -> Vector2:
