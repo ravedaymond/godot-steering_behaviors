@@ -1,4 +1,4 @@
-extends Node
+extends Node2D
 
 
 const Groups: Dictionary = {
@@ -8,18 +8,18 @@ const Groups: Dictionary = {
 }
 
 
-var BoidFactory = preload("res://scenes/characters/boids/boid.tscn")
-var QuarryFactory = preload("res://scenes/characters/quarry/quarry.tscn")
-var BeaconFactory = preload("res://scenes/characters/beacons/beacon.tscn")
+static var BoidFactory = preload("res://scenes/characters/boids/boid.tscn")
+static var QuarryFactory = preload("res://scenes/characters/quarry/quarry.tscn")
+static var BeaconFactory = preload("res://scenes/characters/beacons/beacon.tscn")
+static var UiItemFactory = preload("res://scenes/ui/components/ui_grid_item.tscn")
 
 
 static var CAMERA: Camera
 static var LEVEL: Level
 
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	pass # Replace with function body.
+	pass
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -57,5 +57,4 @@ func create_quarry(global_pos: Vector2, type: Quarry.Type = Quarry.Type.NEUTRAL)
 	quarry.type = type
 	quarry.global_position = global_pos
 	LEVEL.get_node(Groups.QUARRY).add_child(quarry)
-
 

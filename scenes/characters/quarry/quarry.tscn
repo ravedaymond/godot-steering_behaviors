@@ -6,29 +6,29 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_6tieq"]
 radius = 6.0
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_8g5x4"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_0sqn6"]
 atlas = ExtResource("2_hkus0")
-region = Rect2(0, 12, 13, 12)
+region = Rect2(0, 13, 12, 13)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_u0615"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_0vyn7"]
 atlas = ExtResource("2_hkus0")
-region = Rect2(13, 12, 13, 12)
+region = Rect2(12, 13, 12, 13)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_r2rxs"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_bjsib"]
 atlas = ExtResource("2_hkus0")
-region = Rect2(26, 12, 13, 12)
+region = Rect2(24, 13, 12, 13)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_gts4t"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxel5"]
 atlas = ExtResource("2_hkus0")
-region = Rect2(39, 12, 13, 12)
+region = Rect2(36, 13, 12, 13)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_00yp3"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_amg4l"]
 atlas = ExtResource("2_hkus0")
-region = Rect2(52, 12, 13, 12)
+region = Rect2(48, 13, 12, 13)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_wgxm2"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_bxjv4"]
 atlas = ExtResource("2_hkus0")
-region = Rect2(65, 12, 13, 12)
+region = Rect2(60, 13, 12, 13)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_y676k"]
 atlas = ExtResource("2_hkus0")
@@ -38,7 +38,7 @@ region = Rect2(0, 0, 13, 12)
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_8g5x4")
+"texture": SubResource("AtlasTexture_0sqn6")
 }],
 "loop": true,
 "name": &"1",
@@ -46,7 +46,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_u0615")
+"texture": SubResource("AtlasTexture_0vyn7")
 }],
 "loop": true,
 "name": &"2",
@@ -54,7 +54,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_r2rxs")
+"texture": SubResource("AtlasTexture_bjsib")
 }],
 "loop": true,
 "name": &"3",
@@ -62,7 +62,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_gts4t")
+"texture": SubResource("AtlasTexture_yxel5")
 }],
 "loop": true,
 "name": &"4",
@@ -70,7 +70,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_00yp3")
+"texture": SubResource("AtlasTexture_amg4l")
 }],
 "loop": true,
 "name": &"5",
@@ -78,7 +78,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_wgxm2")
+"texture": SubResource("AtlasTexture_bxjv4")
 }],
 "loop": true,
 "name": &"6",
@@ -116,6 +116,7 @@ debug_color = Color(0, 0.6, 0.701961, 0)
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_cbviq")
+animation = &"1"
 
 [node name="VectorLabels" type="VBoxContainer" parent="."]
 offset_right = 40.0

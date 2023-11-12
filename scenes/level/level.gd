@@ -2,8 +2,15 @@ class_name Level
 extends Node2D
 
 
-@export var level_background: Color = Color.TRANSPARENT
 @export var level_grid_color: Color = Color("#3d3d3d")
+
+var boids: Array = []
+var quarry: Array = []
+
+
+@onready var ui_boids: VBoxContainer = $CanvasLayer/Control/Container/MarginContainer/VBoxContainer/ScrollContainerBoids/VBoxContainer
+@onready var ui_quarry: VBoxContainer = $CanvasLayer/Control/Container/MarginContainer/VBoxContainer/ScrollContainerQuarry/VBoxContainer
+@export var level_background: Color = Color.TRANSPARENT
 
 
 func _init():
@@ -14,13 +21,30 @@ func _init():
 
 func _ready():
 	# Create grouping nodes
+	# Set level background color
+	$CanvasLayer/ColorRect.color = level_background
+	# Create grouping nodes
 	for i in Main.Groups:
 		if(!get_node(Main.Groups.get(i))):
 			var node = Node.new()
 			node.name = Main.Groups.get(i)
 			add_child(node)
-	# Set level background color
-	$CanvasLayer/ColorRect.color = level_background
+	# Populate boids and quarry list
+	for i in get_node(Main.Groups.BOIDS).get_children():
+		var new_item = Main.UiItemFactory.instantiate()
+		new_item.name = str(i.get_instance_id())
+		var button = new_item.get_child(0) as Button
+		var label = new_item.get_child(1) as Label
+		button.text = new_item.name
+		label.text = Boid.Behavior.keys()[i.behavior]
+		ui_boids.add_child(new_item)
+	for i in get_node(Main.Groups.QUARRY).get_children():
+		var new_item = Main.UiItemFactory.instantiate()
+		var button = new_item.get_child(0) as Button
+		var label = new_item.get_child(1) as Label
+		button.text = str(i.get_instance_id())
+		label.text = Quarry.Behavior.keys()[i.behavior]
+		ui_quarry.add_child(new_item)
 
 
 func _process(delta):
@@ -28,10 +52,10 @@ func _process(delta):
 
 
 func _draw():
-	var grid_position = get_viewport_rect().size  * get_node("Camera2D").zoom / 2
+	var grid_position = get_viewport_rect().size  * Main.CAMERA.zoom / 2
 	var grid_padding = 100
 	var cell_size = 128
-	var camera_position = get_node("Camera2D").position
+	var camera_position = Main.CAMERA.position
 	var color = level_grid_color
 	# Draw Vertical Lines
 	for i in range(int((camera_position.x - grid_position.x) / cell_size) - 1, int((grid_position.x + camera_position.x) / cell_size) + 1):

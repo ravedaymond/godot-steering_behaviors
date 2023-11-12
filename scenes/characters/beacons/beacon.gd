@@ -6,7 +6,6 @@ enum Type { NEUTRAL, ATTRACTOR, DETRACTOR, }
 const Colors = {
 	Type.NEUTRAL: Color.GRAY,
 	Type.ATTRACTOR: Color.ROYAL_BLUE,
-	Type.DETRACTOR: Color.DARK_ORANGE,
 }
 
 

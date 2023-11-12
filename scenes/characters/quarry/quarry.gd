@@ -3,5 +3,6 @@ extends Boid
 
 
 func _init():
-	add_to_group(Main.Groups.QUARRY)
+	if(behavior != Behavior.STATIC):
+		add_to_group(Main.Groups.QUARRY)
 
