@@ -1,10 +1,14 @@
-[gd_scene load_steps=15 format=3 uid="uid://bgk0aqoulxw6j"]
+[gd_scene load_steps=16 format=3 uid="uid://bgk0aqoulxw6j"]
 
 [ext_resource type="Script" path="res://scenes/characters/quarry/quarry.gd" id="1_kjeg4"]
 [ext_resource type="Texture2D" uid="uid://cxmuhvwanjc45" path="res://scenes/characters/quarry/quarry.png" id="2_hkus0"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_6tieq"]
 radius = 6.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n4lu5"]
+atlas = ExtResource("2_hkus0")
+region = Rect2(36, 0, 12, 13)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_0sqn6"]
 atlas = ExtResource("2_hkus0")
@@ -36,6 +40,14 @@ region = Rect2(0, 0, 13, 12)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_cbviq"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n4lu5")
+}],
+"loop": true,
+"name": &"0",
+"speed": 5.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_0sqn6")
@@ -116,7 +128,7 @@ debug_color = Color(0, 0.6, 0.701961, 0)
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_cbviq")
-animation = &"1"
+animation = &"0"
 
 [node name="VectorLabels" type="VBoxContainer" parent="."]
 offset_right = 40.0

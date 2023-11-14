@@ -1,10 +1,14 @@
-[gd_scene load_steps=18 format=3 uid="uid://bttetwdvp3d27"]
+[gd_scene load_steps=19 format=3 uid="uid://bttetwdvp3d27"]
 
 [ext_resource type="Script" path="res://scenes/characters/boids/boid.gd" id="1_5yryt"]
 [ext_resource type="Texture2D" uid="uid://cetu1sqpsmcqy" path="res://scenes/characters/boids/boid.png" id="2_ojvnr"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_n6c2s"]
 radius = 6.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x7mow"]
+atlas = ExtResource("2_ojvnr")
+region = Rect2(42, 0, 14, 11)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bwrc4"]
 atlas = ExtResource("2_ojvnr")
@@ -48,6 +52,14 @@ region = Rect2(0, 0, 14, 11)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_qpgev"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x7mow")
+}],
+"loop": true,
+"name": &"0",
+"speed": 0.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_bwrc4")
@@ -158,26 +170,6 @@ font_color = Color(0.00784314, 0.509804, 0, 1)
 
 [node name="Boid" type="CharacterBody2D"]
 script = ExtResource("1_5yryt")
-behavior = null
-use_mouse_as_target = null
-use_intervals = null
-velocity_speed = null
-velocity_speed_max = null
-velocity_acceleration = null
-steering_force = null
-steering_force_max = null
-steering_intensity = null
-pursuit_future_multiplier = null
-pursuit_offset = null
-evasion_future_multiplier = null
-arrival_slowing_distance = null
-wander_interval = null
-wander_distance = null
-wander_strength = null
-wander_displacement = null
-debug_enabled = null
-debug_draw_vectors = null
-debug_draw_labels = null
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_n6c2s")
@@ -185,7 +177,7 @@ debug_color = Color(0, 0.6, 0.701961, 0)
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_qpgev")
-animation = &"2"
+animation = &"0"
 
 [node name="VectorLabels" type="VBoxContainer" parent="."]
 offset_right = 40.0

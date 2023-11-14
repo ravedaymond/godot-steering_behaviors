@@ -41,12 +41,12 @@ var velocity_steered: Vector2 = Vector2.ZERO
 @export var steering_intensity: float = 0.01
 var steering_vector: Vector2 = Vector2.ZERO
 @export_subgroup("Pursue", "pursue_")
-@export var pursuit_future_multiplier: float = 10.0
+@export var pursuit_future_multiplier: float = 1.0
 @export var pursuit_offset: float = 1
 var pursuit_vector: Vector2 = Vector2.ZERO
 var pursuit_vector_offset: Vector2 = Vector2.ZERO
 @export_subgroup("Evade", "evade_")
-@export var evasion_future_multiplier: float = 10.0
+@export var evasion_future_multiplier: float = 1.0
 var evasion_vector: Vector2 = Vector2.ZERO
 @export_subgroup("Arrival", "arrival_")
 @export var arrival_slowing_distance: float = 50.0
@@ -54,12 +54,19 @@ var arrival_distance_vector: Vector2 = Vector2.ZERO
 var arrival_distance_length: float
 var arrival_ramped_speed: float
 var arrival_clipped_speed: float
+@export_subgroup("Obstacle Avoidance", "avoidance_")
+var avoidance_target: Vector2 = Vector2.ZERO
+var avoidance_left_a: Vector2 = Vector2.ZERO
+var avoidance_right_a: Vector2 = Vector2.ZERO
+var avoidance_left_b: Vector2
+var avoidance_right_b: Vector2
+var avoidance_magnitude: float
 @export_subgroup("Wander", "wander_")
 @export var wander_interval: float = 0.20
 @export var wander_distance: float = 50.0
 @export var wander_strength: float = 20.0
 @export var wander_displacement: float = 15
-var wander_angle: float
+var wander_angle: float = 0.0
 var wander_area: Vector2 = Vector2.ZERO
 var wander_target: Vector2 = Vector2.ZERO
 var wander_timer: Timer = add_wander_timer()
@@ -80,10 +87,10 @@ func _ready():
 	if(!use_intervals):
 		velocity_speed = velocity_speed_max
 		steering_force = steering_force_max
-	if(behavior == Behavior.STATIC):
-		var x = randf()*sign(randi_range(-1, 1))
-		var y = randf()*sign(randi_range(-1, 1))
-		velocity = Vector2(x, y).normalized()*velocity_speed_max
+#	if(behavior == Behavior.STATIC):
+#		var x = randf()*sign(randi_range(-1, 1))
+#		var y = randf()*sign(randi_range(-1, 1))
+#		velocity = Vector2(x, y).normalized()*velocity_speed_max
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -109,6 +116,8 @@ func _physics_process(_delta):
 			velocity_steered += behavior_evasion(target, pursuit_future_multiplier)
 		Behavior.ARRIVAL:
 			velocity_steered += behavior_arrival(target.global_position)
+		Behavior.OBSTACLE_AVOIDANCE:
+			velocity_steered += behavior_obstacle_avoidance()
 		Behavior.WANDER_RANDOM:
 			if(!find_child(wander_timer.name, false, false)):
 				add_child(wander_timer)
@@ -126,7 +135,8 @@ func _physics_process(_delta):
 	
 	queue_redraw()
 	# Rotate with velocity direction
-	rotation = position.angle_to_point(position+velocity)
+#	rotation = position.angle_to_point(position+velocity)
+	rotation = position.angle_to_point(get_global_mouse_position())
 	debug_labels(rotation)
 
 
@@ -149,6 +159,16 @@ func _draw():
 		draw_line(Vector2.ZERO, velocity_desired, Color.RED, 1.0, false)
 		draw_line(velocity, velocity+steering_vector, Color.MEDIUM_BLUE, 1.0, false)
 		draw_line(Vector2.ZERO, velocity, Color.DARK_GREEN, 1.0, false)
+	elif(behavior in [Behavior.OBSTACLE_AVOIDANCE, ]):
+		draw_arc(to_local(avoidance_left_a), 1, 0, 360, 25, Color.DARK_ORANGE, -1.0, false)
+		draw_arc(to_local(avoidance_right_a), 1, 0, 360, 25, Color.DARK_ORANGE, -1.0, false)
+		draw_arc(to_local(avoidance_left_b), 1, 0, 360, 25, Color.DARK_ORANGE, -1.0, false)
+		draw_arc(to_local(avoidance_right_b), 1, 0, 360, 25, Color.DARK_ORANGE, -1.0, false)
+		draw_line(to_local(avoidance_left_a), to_local(avoidance_left_b), Color.DARK_ORANGE, -1.0, false)
+		draw_line(to_local(avoidance_right_a), to_local(avoidance_right_b), Color.DARK_ORANGE, -1.0, false)
+		# Rotation based debugging
+		draw_set_transform(Vector2.ZERO, -rotation)
+		draw_line(Vector2.ZERO, velocity, Color.DIM_GRAY, 1.0, false)
 	elif(behavior in [Behavior.WANDER_REYNOLDS, ]):
 		draw_circle(to_local(wander_area), wander_strength, Color.DIM_GRAY)
 		draw_line(Vector2.ZERO, to_local(wander_target), Color.RED, 1.0, false)
@@ -163,9 +183,9 @@ func _draw():
 
 
 
-func debug_labels(rotation: float):
+func debug_labels(rotval: float):
 	if(debug_draw_labels):
-		$VectorLabels.rotation = -rotation
+		$VectorLabels.rotation = -rotval
 	#	$Velocity.global_position = global_position
 		$VectorLabels/Velocity.text = "V"+str(velocity)
 	#	$Desired.global_position = global_position+velocity_desired
@@ -207,14 +227,14 @@ func decide_on_target():
 # Does not handle collision detection and can cause physic wonkyness when
 #	bumping into other moving objects.
 func behavior_seek(seek_position: Vector2) -> Vector2:
-	velocity_desired = (seek_position - position).normalized()*velocity_speed
+	velocity_desired = (seek_position - global_position).normalized()*velocity_speed
 	steering_vector = (velocity_desired - velocity).limit_length(steering_force)
 	return steering_vector
 
 
 # Apply steering force towards a direct path away from the target.
 func behavior_flee(flee_position: Vector2) -> Vector2:
-	velocity_desired = (position - flee_position).limit_length(velocity_speed)
+	velocity_desired = (global_position - flee_position).limit_length(velocity_speed)
 	steering_vector = (velocity_desired - velocity).limit_length(steering_force)
 	return steering_vector
 
@@ -227,7 +247,7 @@ func behavior_pursuit(pursuit_target: Object, pursuit_future_multiplier: float) 
 	if(is_instance_valid(pursuit_target)):
 		if("velocity" in pursuit_target):
 			pursuit_vector = Vector2(pursuit_target.velocity)
-		pursuit_vector * pursuit_future_multiplier
+		pursuit_vector *= pursuit_future_multiplier
 		pursuit_vector += pursuit_target.global_position
 	return behavior_seek(pursuit_vector)
 
@@ -242,7 +262,7 @@ func behavior_evasion(evade_target: Object, evasion_future_multiplier) -> Vector
 	if(is_instance_valid(evade_target)):
 		if("velocity" in evade_target):
 			evasion_vector = Vector2(evade_target.velocity)
-		evasion_vector * evasion_future_multiplier
+		evasion_vector *= evasion_future_multiplier
 		evasion_vector += evade_target.global_position
 	return behavior_flee(evasion_vector)
 
@@ -256,7 +276,7 @@ func behavior_pursuit_offset(pursuit_target: Object, pursuit_future_multiplier: 
 	if(is_instance_valid(pursuit_target)):
 		if("velocity" in pursuit_target):
 			pursuit_vector = Vector2(pursuit_target.velocity)
-		pursuit_vector * pursuit_future_multiplier
+		pursuit_vector *= pursuit_future_multiplier
 		pursuit_vector += pursuit_target.global_position
 		var min_offset = $CollisionShape2D.shape.radius + pursuit_target.get_node("CollisionShape2D").shape.radius
 		pursuit_offset = max(min_offset, pursuit_offset)
@@ -284,6 +304,29 @@ func behavior_arrival(arrival_position: Vector2) -> Vector2:
 
 
 func behavior_obstacle_avoidance() -> Vector2:
+	var r = $CollisionShape2D.shape.radius
+	var ax = global_position.x + r * cos(rotation+(PI/2))
+	var ay = global_position.y + r * sin(rotation+(PI/2))
+	var avoidance_angle = Vector2.from_angle(rotation-deg_to_rad(90))*r
+	avoidance_left_a = global_position + avoidance_angle
+	avoidance_right_a = global_position - avoidance_angle
+	avoidance_magnitude = max(r*4, velocity.length())
+	avoidance_left_b = avoidance_left_a + Vector2.from_angle(rotation)*avoidance_magnitude
+	avoidance_right_b = avoidance_right_a + Vector2.from_angle(rotation)*avoidance_magnitude
+	
+	
+	# Ray cast collision query
+	var space_state = get_world_2d().direct_space_state
+	# Use global coordinates
+	var center_query = PhysicsRayQueryParameters2D.create(global_position, global_position+velocity, collision_mask, [self])
+	var center_result = space_state.intersect_ray(center_query)
+#	print(result)
+	var left_query = PhysicsRayQueryParameters2D.create(avoidance_left_a, avoidance_left_b, collision_mask, [self])
+	var left_result = space_state.intersect_ray(left_query)
+	var right_query = PhysicsRayQueryParameters2D.create(avoidance_right_a, avoidance_right_b, collision_mask, [self])
+	var right_result = space_state.intersect_ray(right_query)
+	
+	print(right_result)
 	return steering_vector
 
 

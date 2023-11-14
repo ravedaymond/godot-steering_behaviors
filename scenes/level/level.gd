@@ -2,12 +2,19 @@ class_name Level
 extends Node2D
 
 
+enum ContextActions {
+	CREATE,
+	DELETE,
+}
+
 @export var level_grid_color: Color = Color("#3d3d3d")
 
 var boids: Array = []
 var quarry: Array = []
+var level_context_action: ContextActions = ContextActions.CREATE
 
-
+@onready var ui_context_create: CheckButton = $CanvasLayer/Control/Container/MarginContainer/VBoxContainer/HBoxContainer/ButtonCreate
+@onready var ui_context_delete: CheckButton = $CanvasLayer/Control/Container/MarginContainer/VBoxContainer/HBoxContainer/ButtonDelete
 @onready var ui_boids: VBoxContainer = $CanvasLayer/Control/Container/MarginContainer/VBoxContainer/ScrollContainerBoids/VBoxContainer
 @onready var ui_quarry: VBoxContainer = $CanvasLayer/Control/Container/MarginContainer/VBoxContainer/ScrollContainerQuarry/VBoxContainer
 @export var level_background: Color = Color.TRANSPARENT
@@ -47,7 +54,12 @@ func _ready():
 		ui_quarry.add_child(new_item)
 
 
-func _process(delta):
+func _process(_delta):
+	if(ui_context_create.button_pressed):
+		level_context_action = ContextActions.CREATE
+	elif(ui_context_delete.button_pressed):
+		level_context_action = ContextActions.DELETE
+	
 	queue_redraw()
 
 

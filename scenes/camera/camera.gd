@@ -19,7 +19,7 @@ func _init():
 	Main.CAMERA = self
 
 
-func _process(delta):
+func _process(_delta):
 	camera_zoom()
 	camera_rotate()
 	if(follow_target):

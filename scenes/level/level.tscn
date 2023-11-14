@@ -13,6 +13,7 @@ script = ExtResource("1_q5sdl")
 layer = -10
 
 [node name="Control" type="Control" parent="CanvasLayer"]
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -44,12 +45,13 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="ButtonSelect" type="CheckButton" parent="CanvasLayer/Control/Container/MarginContainer/VBoxContainer/HBoxContainer"]
+visible = false
 layout_mode = 2
 button_pressed = true
 button_group = ExtResource("2_72hqo")
 text = "Select"
 
-[node name="ButtonNew" type="CheckButton" parent="CanvasLayer/Control/Container/MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="ButtonCreate" type="CheckButton" parent="CanvasLayer/Control/Container/MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 button_group = ExtResource("2_72hqo")
 text = "Create"
@@ -100,26 +102,73 @@ color = Color(1, 1, 1, 0)
 [node name="Boids" type="Node" parent="."]
 
 [node name="Boid" parent="Boids" instance=ExtResource("3_4fvya")]
-visible = false
-position = Vector2(-32, 0)
+position = Vector2(-69, 0)
 behavior = 7
 
 [node name="Quarry" type="Node" parent="."]
 
+[node name="Quarry" parent="Quarry" instance=ExtResource("4_adlrg")]
+position = Vector2(54, 56)
+use_mouse_as_target = false
+
 [node name="Quarry2" parent="Quarry" instance=ExtResource("4_adlrg")]
-visible = false
-position = Vector2(45, 7)
+position = Vector2(44, 16)
+use_mouse_as_target = false
 
 [node name="Quarry3" parent="Quarry" instance=ExtResource("4_adlrg")]
-visible = false
-position = Vector2(84, -14)
+position = Vector2(66, -7)
+use_mouse_as_target = false
 
 [node name="Quarry4" parent="Quarry" instance=ExtResource("4_adlrg")]
-visible = false
-position = Vector2(112, 7)
+position = Vector2(20, -35)
+use_mouse_as_target = false
 
 [node name="Quarry5" parent="Quarry" instance=ExtResource("4_adlrg")]
-visible = false
-position = Vector2(153, -12)
+position = Vector2(134, 1)
+use_mouse_as_target = false
+
+[node name="Quarry6" parent="Quarry" instance=ExtResource("4_adlrg")]
+position = Vector2(100, 30)
+use_mouse_as_target = false
+
+[node name="Quarry7" parent="Quarry" instance=ExtResource("4_adlrg")]
+position = Vector2(103, -30)
+use_mouse_as_target = false
+
+[node name="Quarry8" parent="Quarry" instance=ExtResource("4_adlrg")]
+position = Vector2(7, 32)
+use_mouse_as_target = false
+
+[node name="Quarry9" parent="Quarry" instance=ExtResource("4_adlrg")]
+position = Vector2(174, 29)
+use_mouse_as_target = false
+
+[node name="Quarry10" parent="Quarry" instance=ExtResource("4_adlrg")]
+position = Vector2(170, -21)
+use_mouse_as_target = false
+
+[node name="Quarry11" parent="Quarry" instance=ExtResource("4_adlrg")]
+position = Vector2(222, 4)
+use_mouse_as_target = false
+
+[node name="Quarry12" parent="Quarry" instance=ExtResource("4_adlrg")]
+position = Vector2(90, -43)
+use_mouse_as_target = false
+
+[node name="Quarry13" parent="Quarry" instance=ExtResource("4_adlrg")]
+position = Vector2(155, -50)
+use_mouse_as_target = false
+
+[node name="Quarry14" parent="Quarry" instance=ExtResource("4_adlrg")]
+position = Vector2(120, 32)
+use_mouse_as_target = false
+
+[node name="Quarry15" parent="Quarry" instance=ExtResource("4_adlrg")]
+position = Vector2(-55, 17)
+use_mouse_as_target = false
+
+[node name="Quarry16" parent="Quarry" instance=ExtResource("4_adlrg")]
+position = Vector2(-62, -22)
+use_mouse_as_target = false
 
 [node name="Beacons" type="Node" parent="."]

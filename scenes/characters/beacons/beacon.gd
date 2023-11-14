@@ -22,7 +22,7 @@ func _ready():
 	$CollisionShape2D.shape.radius = size
 
 
-func _process(delta):
+func _process(_delta):
 	queue_redraw()
 
 
