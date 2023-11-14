@@ -21,6 +21,12 @@ enum Behavior {
 	FLOW_FIELD,
 }
 
+enum ObstacleAvoidance {
+	NONE,
+	AREA2D,
+	RAYCAST,
+}
+
 enum Type {
 	NEUTRAL,
 	PASSIVE,
@@ -29,11 +35,12 @@ enum Type {
 }
 
 @export var behavior: Behavior = Behavior.STATIC
+@export var obstacle_avoidance: ObstacleAvoidance = ObstacleAvoidance.NONE
 @export var use_mouse_as_target: bool = false
 @export var use_intervals: bool = false
 @export var velocity_speed: float = 0.0
 @export var velocity_speed_max: float = 50.0
-@export var velocity_acceleration: float = 1.0
+@export var velocity_acceleration: float = 0.1
 var velocity_desired: Vector2 = Vector2.ZERO
 var velocity_steered: Vector2 = Vector2.ZERO
 @export var steering_force: float = 0.0
@@ -55,12 +62,16 @@ var arrival_distance_length: float
 var arrival_ramped_speed: float
 var arrival_clipped_speed: float
 @export_subgroup("Obstacle Avoidance", "avoidance_")
-var avoidance_target: Vector2 = Vector2.ZERO
-var avoidance_left_a: Vector2 = Vector2.ZERO
-var avoidance_right_a: Vector2 = Vector2.ZERO
-var avoidance_left_b: Vector2
-var avoidance_right_b: Vector2
+var avoidance_area: Area2D
+var avoidance_target: CollisionObject2D
+var avoidance_left_position: Vector2 = Vector2.ZERO
+var avoidance_right_position: Vector2 = Vector2.ZERO
+var avoidance_left_vector: Vector2
+var avoidance_right_vector: Vector2
+var avoidance_center_vector: Vector2
+var avoidance_area_multiplier: float = 4.0
 var avoidance_magnitude: float
+var avoidance_angle: Vector2
 @export_subgroup("Wander", "wander_")
 @export var wander_interval: float = 0.20
 @export var wander_distance: float = 50.0
@@ -87,11 +98,13 @@ func _ready():
 	if(!use_intervals):
 		velocity_speed = velocity_speed_max
 		steering_force = steering_force_max
-#	if(behavior == Behavior.STATIC):
+	if(behavior == Behavior.STATIC):
 #		var x = randf()*sign(randi_range(-1, 1))
 #		var y = randf()*sign(randi_range(-1, 1))
 #		velocity = Vector2(x, y).normalized()*velocity_speed_max
-
+		pass
+	elif(behavior == Behavior.OBSTACLE_AVOIDANCE):
+		velocity = Vector2(50, 0)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
@@ -99,7 +112,7 @@ func _process(_delta):
 
 
 func _physics_process(_delta):
-	if(use_intervals):
+	if(use_intervals && behavior != Behavior.STATIC):
 		velocity_speed = clampf(velocity_speed+velocity_acceleration, 0, velocity_speed_max)
 		steering_force = clampf(steering_force+steering_intensity, 0, steering_force_max)
 	decide_on_target()
@@ -117,7 +130,10 @@ func _physics_process(_delta):
 		Behavior.ARRIVAL:
 			velocity_steered += behavior_arrival(target.global_position)
 		Behavior.OBSTACLE_AVOIDANCE:
-			velocity_steered += behavior_obstacle_avoidance()
+			if(obstacle_avoidance == ObstacleAvoidance.AREA2D):
+				velocity_steered += behavior_obstacle_avoidance_area2d()
+			if(obstacle_avoidance == ObstacleAvoidance.RAYCAST):
+				velocity_steered += behavior_obstacle_avoidance_raycast()
 		Behavior.WANDER_RANDOM:
 			if(!find_child(wander_timer.name, false, false)):
 				add_child(wander_timer)
@@ -128,21 +144,20 @@ func _physics_process(_delta):
 			velocity_steered += behavior_wander_reynolds(wander_interval)
 		_:
 			behavior = Behavior.STATIC
-	
-	velocity = velocity + velocity_steered
+	velocity += velocity_steered
 	move_and_slide()
 	velocity_steered = Vector2.ZERO
 	
 	queue_redraw()
 	# Rotate with velocity direction
-#	rotation = position.angle_to_point(position+velocity)
-	rotation = position.angle_to_point(get_global_mouse_position())
+	rotation = position.angle_to_point(position+velocity)
+#	rotation = position.angle_to_point(get_global_mouse_position())
 	debug_labels(rotation)
 
 
 func _draw():
 	if(!debug_draw_vectors): return
-	if(behavior in [Behavior.SEEK, Behavior.FLEE, Behavior.PURSUIT, Behavior.PURSUIT_OFFSET, Behavior.EVASION, Behavior.ARRIVAL, Behavior.WANDER_RANDOM, ]):
+	if(behavior in [Behavior.SEEK, Behavior.FLEE, Behavior.PURSUIT, Behavior.PURSUIT_OFFSET, Behavior.EVASION, Behavior.ARRIVAL, Behavior.WANDER_RANDOM, Behavior.OBSTACLE_AVOIDANCE, ]):
 		if(target):
 			if(behavior == Behavior.PURSUIT):
 				draw_line(Vector2.ZERO, to_local(pursuit_vector), Color.DIM_GRAY, 1.0, false)
@@ -151,35 +166,34 @@ func _draw():
 			if(behavior == Behavior.PURSUIT_OFFSET):
 				draw_line(to_local(pursuit_vector), to_local(pursuit_vector_offset), Color.DIM_GRAY, 1.0, false)
 				draw_line(Vector2.ZERO, to_local(pursuit_vector_offset), Color.DIM_GRAY, 1.0, false)
+			if(obstacle_avoidance == ObstacleAvoidance.AREA2D):
+				if(avoidance_target):
+					draw_line(Vector2.ZERO, to_local(avoidance_target.global_position), Color.DIM_GRAY, 1.0, false)
 			else:
 				draw_line(Vector2.ZERO, to_local(target.global_position), Color.DIM_GRAY, 1.0, false)
-		# Rotation based debugging
-		draw_set_transform(Vector2.ZERO, -rotation)
-		draw_line(velocity, velocity_desired, Color.DIM_GRAY, 1.0, false)
-		draw_line(Vector2.ZERO, velocity_desired, Color.RED, 1.0, false)
-		draw_line(velocity, velocity+steering_vector, Color.MEDIUM_BLUE, 1.0, false)
-		draw_line(Vector2.ZERO, velocity, Color.DARK_GREEN, 1.0, false)
-	elif(behavior in [Behavior.OBSTACLE_AVOIDANCE, ]):
-		draw_arc(to_local(avoidance_left_a), 1, 0, 360, 25, Color.DARK_ORANGE, -1.0, false)
-		draw_arc(to_local(avoidance_right_a), 1, 0, 360, 25, Color.DARK_ORANGE, -1.0, false)
-		draw_arc(to_local(avoidance_left_b), 1, 0, 360, 25, Color.DARK_ORANGE, -1.0, false)
-		draw_arc(to_local(avoidance_right_b), 1, 0, 360, 25, Color.DARK_ORANGE, -1.0, false)
-		draw_line(to_local(avoidance_left_a), to_local(avoidance_left_b), Color.DARK_ORANGE, -1.0, false)
-		draw_line(to_local(avoidance_right_a), to_local(avoidance_right_b), Color.DARK_ORANGE, -1.0, false)
-		# Rotation based debugging
-		draw_set_transform(Vector2.ZERO, -rotation)
-		draw_line(Vector2.ZERO, velocity, Color.DIM_GRAY, 1.0, false)
+		draw_line(velocity.rotated(-rotation), velocity_desired.rotated(-rotation), Color.DIM_GRAY, 1.0, false)
+		draw_line(Vector2.ZERO, velocity_desired.rotated(-rotation), Color.RED, 1.0, false)
+		draw_line(velocity.rotated(-rotation), (velocity+steering_vector).rotated(-rotation), Color.MEDIUM_BLUE, 1.0, false)
+		draw_line(Vector2.ZERO, velocity.rotated(-rotation), Color.DARK_GREEN, 1.0, false)
+	elif(obstacle_avoidance in [ObstacleAvoidance.RAYCAST, ]):
+		draw_arc(to_local(avoidance_left_position), 1, 0, 360, 25, Color.DIM_GRAY, 1.0, false)
+		draw_arc(to_local(avoidance_right_position), 1, 0, 360, 25, Color.DIM_GRAY, 1.0, false)
+		draw_arc(to_local(avoidance_left_vector), 1, 0, 360, 25, Color.DIM_GRAY, 1.0, false)
+		draw_arc(to_local(avoidance_right_vector), 1, 0, 360, 25, Color.DIM_GRAY, 1.0, false)
+		draw_arc(to_local(avoidance_center_vector), 1, 0, 360, 25, Color.DIM_GRAY, 1.0, false)
+		draw_line(to_local(avoidance_left_position), to_local(avoidance_left_vector), Color.DIM_GRAY, 1.0, false)
+		draw_line(to_local(avoidance_right_position), to_local(avoidance_right_vector), Color.DIM_GRAY, 1.0, false)
+		draw_line(to_local(global_position), to_local(avoidance_center_vector), Color.DIM_GRAY, 1.0, false)
+		draw_line(Vector2.ZERO, velocity.rotated(-rotation), Color.DIM_GRAY, 1.0, false)
 	elif(behavior in [Behavior.WANDER_REYNOLDS, ]):
 		draw_circle(to_local(wander_area), wander_strength, Color.DIM_GRAY)
 		draw_line(Vector2.ZERO, to_local(wander_target), Color.RED, 1.0, false)
 		draw_line(to_local(wander_area), to_local(wander_target), Color.RED, 1.0, false)
 		draw_arc(to_local(wander_target), 1, 0, 360, 25, Color.RED, 1.0, false)
-		# Rotation based debugging
-		draw_set_transform(Vector2.ZERO, -rotation)
-		draw_line(velocity, velocity_desired, Color.DIM_GRAY, 1.0, false)
-#		draw_line(Vector2.ZERO, velocity_desired, Color.RED, 1.0, false)
-		draw_line(velocity, velocity+steering_vector, Color.MEDIUM_BLUE, 1.0, false)
-		draw_line(Vector2.ZERO, velocity, Color.DARK_GREEN, 1.0, false)
+		draw_line(velocity.rotated(-rotation), velocity_desired.rotated(-rotation), Color.DIM_GRAY, 1.0, false)
+#		draw_line(Vector2.ZERO, velocity_desired.rotated(-rotation), Color.RED, 1.0, false)
+		draw_line(velocity.rotated(rotation), (velocity+steering_vector).rotated(-rotation), Color.MEDIUM_BLUE, 1.0, false)
+		draw_line(Vector2.ZERO, velocity.rotated(rotation), Color.DARK_GREEN, 1.0, false)
 
 
 
@@ -303,31 +317,61 @@ func behavior_arrival(arrival_position: Vector2) -> Vector2:
 	return steering_vector
 
 
-func behavior_obstacle_avoidance() -> Vector2:
-	var r = $CollisionShape2D.shape.radius
-	var ax = global_position.x + r * cos(rotation+(PI/2))
-	var ay = global_position.y + r * sin(rotation+(PI/2))
-	var avoidance_angle = Vector2.from_angle(rotation-deg_to_rad(90))*r
-	avoidance_left_a = global_position + avoidance_angle
-	avoidance_right_a = global_position - avoidance_angle
-	avoidance_magnitude = max(r*4, velocity.length())
-	avoidance_left_b = avoidance_left_a + Vector2.from_angle(rotation)*avoidance_magnitude
-	avoidance_right_b = avoidance_right_a + Vector2.from_angle(rotation)*avoidance_magnitude
+func behavior_obstacle_avoidance_raycast() -> Vector2:
+	# Calculate required vectors for raycast
+	var avoidance_angle = Vector2.from_angle(rotation-deg_to_rad(90)) * $CollisionShape2D.shape.radius
+	avoidance_left_position = global_position + avoidance_angle
+	avoidance_right_position = global_position - avoidance_angle
+	avoidance_magnitude = max($CollisionShape2D.shape.radius*4, velocity.length())
+	avoidance_left_vector = avoidance_left_position + Vector2.from_angle(rotation) * avoidance_magnitude
+	avoidance_right_vector = avoidance_right_position + Vector2.from_angle(rotation) * avoidance_magnitude
+	avoidance_center_vector = global_position + Vector2.from_angle(rotation) * avoidance_magnitude
 	
-	
-	# Ray cast collision query
+	# Ray cast collision query (use global coordinates)
 	var space_state = get_world_2d().direct_space_state
-	# Use global coordinates
-	var center_query = PhysicsRayQueryParameters2D.create(global_position, global_position+velocity, collision_mask, [self])
+	var center_query = PhysicsRayQueryParameters2D.create(global_position, avoidance_center_vector, collision_mask, [self])
 	var center_result = space_state.intersect_ray(center_query)
-#	print(result)
-	var left_query = PhysicsRayQueryParameters2D.create(avoidance_left_a, avoidance_left_b, collision_mask, [self])
+	var left_query = PhysicsRayQueryParameters2D.create(avoidance_left_position, avoidance_left_vector, collision_mask, [self])
 	var left_result = space_state.intersect_ray(left_query)
-	var right_query = PhysicsRayQueryParameters2D.create(avoidance_right_a, avoidance_right_b, collision_mask, [self])
+	var right_query = PhysicsRayQueryParameters2D.create(avoidance_right_position, avoidance_right_vector, collision_mask, [self])
 	var right_result = space_state.intersect_ray(right_query)
 	
-	print(right_result)
 	return steering_vector
+
+
+func behavior_obstacle_avoidance_area2d() -> Vector2:
+	if(!avoidance_area):
+		var load = load("res://scenes/characters/shared/obstacle_avoidance_area.tscn")
+		avoidance_area = load.instantiate() as Area2D
+		add_child(avoidance_area)
+		avoidance_angle = Vector2.from_angle(rotation-deg_to_rad(90)) * $CollisionShape2D.shape.radius
+		avoidance_left_position = global_position + avoidance_angle
+		avoidance_right_position = global_position - avoidance_angle
+		avoidance_area.get_node("CollisionShape2D").shape.size.y = (avoidance_left_position - avoidance_right_position).length()
+	avoidance_magnitude = max($CollisionShape2D.shape.radius * avoidance_area_multiplier, velocity.length())
+	avoidance_area.get_node("CollisionShape2D").shape.size.x = avoidance_magnitude
+	
+	if(avoidance_target):
+		velocity_desired = (global_position+velocity - avoidance_target.global_position).normalized() * velocity_speed
+		steering_vector = (velocity_desired - velocity).limit_length(steering_force)
+	else:
+		steering_vector = Vector2.ZERO
+	return steering_vector
+
+
+func _on_obstacle_avoidance_area_body_entered(body) -> void:
+	if(body == self): return
+	if(avoidance_target):
+		if(global_position.distance_to(body.global_position) < global_position.distance_to(avoidance_target.global_position)):
+			avoidance_target = body
+	else:
+		avoidance_target = body
+
+
+func _on_obstacle_avoidance_area_body_exited(body) -> void:
+	if(body == self): return
+	if(body == avoidance_target):
+		avoidance_target = null
 
 
 func behavior_wander_random(wander_interval: float) -> Vector2:

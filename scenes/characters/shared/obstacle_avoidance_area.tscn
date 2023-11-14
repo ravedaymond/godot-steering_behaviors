@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://dvr1cdu8wuidk"]
+
+[ext_resource type="Script" path="res://scenes/characters/shared/obstacle_avoidance_area.gd" id="1_ky0ac"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6pbte"]
+
+[node name="ObstacleAvoidanceArea" type="Area2D"]
+script = ExtResource("1_ky0ac")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_6pbte")

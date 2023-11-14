@@ -10,7 +10,6 @@
 script = ExtResource("1_q5sdl")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
-layer = -10
 
 [node name="Control" type="Control" parent="CanvasLayer"]
 visible = false
@@ -20,7 +19,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_force_pass_scroll_events = false
 
 [node name="Container" type="PanelContainer" parent="CanvasLayer/Control"]
 layout_mode = 0
@@ -68,7 +66,6 @@ text = "Boids"
 [node name="ScrollContainerBoids" type="ScrollContainer" parent="CanvasLayer/Control/Container/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 128)
 layout_mode = 2
-mouse_filter = 0
 mouse_force_pass_scroll_events = false
 horizontal_scroll_mode = 0
 
@@ -82,7 +79,6 @@ text = "Quarry"
 [node name="ScrollContainerQuarry" type="ScrollContainer" parent="CanvasLayer/Control/Container/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
-mouse_filter = 0
 mouse_force_pass_scroll_events = false
 horizontal_scroll_mode = 0
 
@@ -104,6 +100,9 @@ color = Color(1, 1, 1, 0)
 [node name="Boid" parent="Boids" instance=ExtResource("3_4fvya")]
 position = Vector2(-69, 0)
 behavior = 7
+obstacle_avoidance = 1
+use_mouse_as_target = true
+use_intervals = true
 
 [node name="Quarry" type="Node" parent="."]
 
@@ -112,15 +111,15 @@ position = Vector2(54, 56)
 use_mouse_as_target = false
 
 [node name="Quarry2" parent="Quarry" instance=ExtResource("4_adlrg")]
-position = Vector2(44, 16)
+position = Vector2(35, 0)
 use_mouse_as_target = false
 
 [node name="Quarry3" parent="Quarry" instance=ExtResource("4_adlrg")]
-position = Vector2(66, -7)
+position = Vector2(-29, 20)
 use_mouse_as_target = false
 
 [node name="Quarry4" parent="Quarry" instance=ExtResource("4_adlrg")]
-position = Vector2(20, -35)
+position = Vector2(-8, -44)
 use_mouse_as_target = false
 
 [node name="Quarry5" parent="Quarry" instance=ExtResource("4_adlrg")]
@@ -136,7 +135,7 @@ position = Vector2(103, -30)
 use_mouse_as_target = false
 
 [node name="Quarry8" parent="Quarry" instance=ExtResource("4_adlrg")]
-position = Vector2(7, 32)
+position = Vector2(9, 12)
 use_mouse_as_target = false
 
 [node name="Quarry9" parent="Quarry" instance=ExtResource("4_adlrg")]
@@ -164,11 +163,11 @@ position = Vector2(120, 32)
 use_mouse_as_target = false
 
 [node name="Quarry15" parent="Quarry" instance=ExtResource("4_adlrg")]
-position = Vector2(-55, 17)
+position = Vector2(78, 11)
 use_mouse_as_target = false
 
 [node name="Quarry16" parent="Quarry" instance=ExtResource("4_adlrg")]
-position = Vector2(-62, -22)
+position = Vector2(-4, -14)
 use_mouse_as_target = false
 
 [node name="Beacons" type="Node" parent="."]
