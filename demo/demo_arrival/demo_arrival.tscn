@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://dy4r0iqjxvcdl"]
+
+[ext_resource type="PackedScene" uid="uid://g4lwk5ek5jde" path="res://scenes/level/level.tscn" id="1_pkpw3"]
+
+[node name="demo_arrival" instance=ExtResource("1_pkpw3")]
+
+[node name="Control" parent="CanvasLayer" index="0"]
+visible = true

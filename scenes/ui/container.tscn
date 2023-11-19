@@ -1,0 +1,67 @@
+[gd_scene load_steps=2 format=3 uid="uid://dqdw643bxjdhf"]
+
+[ext_resource type="ButtonGroup" uid="uid://cswheque6gmkm" path="res://scenes/ui/boid_mouse_button_group.tres" id="1_ylddk"]
+
+[node name="Container" type="PanelContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 2
+color = Color(0, 0, 0, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonSelect" type="CheckButton" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+visible = false
+layout_mode = 2
+button_pressed = true
+button_group = ExtResource("1_ylddk")
+text = "Select"
+
+[node name="ButtonCreate" type="CheckButton" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+button_group = ExtResource("1_ylddk")
+text = "Create"
+
+[node name="ButtonDelete" type="CheckButton" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+button_group = ExtResource("1_ylddk")
+text = "Delete"
+
+[node name="LabelBoids" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Boids"
+
+[node name="ScrollContainerBoids" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 128)
+layout_mode = 2
+mouse_force_pass_scroll_events = false
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainerBoids"]
+layout_mode = 2
+
+[node name="LabelQuarry" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Quarry"
+
+[node name="ScrollContainerQuarry" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+mouse_force_pass_scroll_events = false
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainerQuarry"]
+layout_mode = 2

@@ -1,0 +1,70 @@
+[gd_scene load_steps=5 format=3 uid="uid://dmhit1n8mqbvi"]
+
+[ext_resource type="ButtonGroup" uid="uid://djxyr6bj00xqo" path="res://scenes/ui/modules/main_menu/ui_main_menu_button_group.tres" id="1_rpt05"]
+[ext_resource type="Texture2D" uid="uid://2bdd4vmlydcv" path="res://assets/demo_seek_flee.png" id="2_41mfa"]
+
+[sub_resource type="GDScript" id="GDScript_iohkk"]
+script/source = "extends PanelContainer
+
+
+func _on_button_toggled(button_pressed):
+	if(button_pressed):
+		Global.DEMO_SELECTED = get_meta(\"demo_scene\")
+		Global.WINDOW_TITLE = get_meta(\"window_title\")
+"
+
+[sub_resource type="GDScript" id="GDScript_76uhr"]
+script/source = "extends Container
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	var child = get_child(0) as Control
+	child.mouse_filter = self.mouse_filter
+	fit_child_in_rect(child, Rect2(position, custom_minimum_size))
+"
+
+[node name="MainMenuGridItem" type="PanelContainer"]
+offset_right = 144.0
+offset_bottom = 171.0
+script = SubResource("GDScript_iohkk")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 2
+toggle_mode = true
+button_group = ExtResource("1_rpt05")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Container" type="Container" parent="MarginContainer/VBoxContainer"]
+clip_contents = true
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+mouse_filter = 2
+script = SubResource("GDScript_76uhr")
+
+[node name="Image" type="TextureRect" parent="MarginContainer/VBoxContainer/Container"]
+layout_mode = 2
+texture = ExtResource("2_41mfa")
+expand_mode = 1
+
+[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+bbcode_enabled = true
+text = "[center]Level Name[/center]"
+fit_content = true
+
+[connection signal="toggled" from="Button" to="." method="_on_button_toggled"]

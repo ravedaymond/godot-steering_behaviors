@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://dlewv5k8gd0a0"]
+
+[ext_resource type="PackedScene" uid="uid://c82anyrv7v5du" path="res://scenes/environment/region/region.tscn" id="1_j5y7a"]
+[ext_resource type="PackedScene" uid="uid://bttetwdvp3d27" path="res://scenes/characters/boids/boid.tscn" id="2_c5tfa"]
+[ext_resource type="PackedScene" uid="uid://bgk0aqoulxw6j" path="res://scenes/characters/quarry/quarry.tscn" id="3_vjjju"]
+
+[node name="RegionOffsetPursuitQuarry" instance=ExtResource("1_j5y7a")]
+
+[node name="Boid" parent="Boids" index="0" instance=ExtResource("2_c5tfa")]
+position = Vector2(104, 0)
+behavior = 5
+target_quarry = true
+
+[node name="Quarry" parent="Quarry" index="0" instance=ExtResource("3_vjjju")]
+position = Vector2(-136, 56)
+starting_velocity = Vector2(1, 1)

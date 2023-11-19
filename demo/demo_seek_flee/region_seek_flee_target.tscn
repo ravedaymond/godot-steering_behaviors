@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://gtobukrufr0"]
+
+[ext_resource type="PackedScene" uid="uid://c82anyrv7v5du" path="res://scenes/environment/region/region.tscn" id="1_grqx4"]
+[ext_resource type="PackedScene" uid="uid://bttetwdvp3d27" path="res://scenes/characters/boids/boid.tscn" id="2_n6cge"]
+[ext_resource type="PackedScene" uid="uid://1qnup48711p4" path="res://scenes/characters/stations/station.tscn" id="3_cxcci"]
+
+[node name="RegionSeekFleeTarget" instance=ExtResource("1_grqx4")]
+
+[node name="Label" parent="Control" index="0"]
+text = "Seek or Flee on a stationary
+target will eventually 'ping-pong'
+over that target a distance relative
+to it's velocity when reaching that
+targets position."
+
+[node name="Boid" parent="Boids" index="0" instance=ExtResource("2_n6cge")]
+position = Vector2(-104, 0)
+behavior = 1
+target_station = true
+
+[node name="Station" parent="Stations" index="0" instance=ExtResource("3_cxcci")]
+monitoring = true
+station_color = 2

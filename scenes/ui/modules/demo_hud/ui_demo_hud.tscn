@@ -1,0 +1,91 @@
+[gd_scene load_steps=15 format=3 uid="uid://8x2bngf2am7d"]
+
+[ext_resource type="Texture2D" uid="uid://bh8mmk7tdepkq" path="res://scenes/ui/modules/demo_hud/behavior_color_atlas/ui_behavior_color_seek_atlas.tres" id="1_44qwb"]
+[ext_resource type="Texture2D" uid="uid://co288vcufbivh" path="res://scenes/ui/modules/demo_hud/behavior_color_atlas/ui_behavior_color_flee_atlas.tres" id="2_7odxm"]
+[ext_resource type="Texture2D" uid="uid://37dyq58lpt70" path="res://scenes/ui/modules/demo_hud/behavior_color_atlas/ui_behavior_color_pursuit_atlas.tres" id="3_ijx18"]
+[ext_resource type="Texture2D" uid="uid://l8q7gt6gq15d" path="res://scenes/ui/modules/demo_hud/behavior_color_atlas/ui_behavior_color_evasion_atlas.tres" id="4_fj2af"]
+[ext_resource type="Texture2D" uid="uid://dyhdyxkon8h1u" path="res://scenes/ui/modules/demo_hud/behavior_color_atlas/ui_behavior_color_offset_pursuit_atlas.tres" id="5_32fiu"]
+[ext_resource type="Texture2D" uid="uid://go8law5d4mhx" path="res://scenes/ui/modules/demo_hud/behavior_color_atlas/ui_behavior_color_arrival_atlas.tres" id="6_wsayf"]
+[ext_resource type="Script" path="res://scenes/ui/modules/demo_hud/ui_menu_button_info_only_toggle.gd" id="7_xf7wc"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a3k8p"]
+bg_color = Color(0.2, 0.2, 0.2, 1)
+
+[sub_resource type="Gradient" id="Gradient_fd73v"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0, 1, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_80q1w"]
+gradient = SubResource("Gradient_fd73v")
+width = 16
+height = 16
+
+[sub_resource type="Gradient" id="Gradient_jt1pq"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(1, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_w704c"]
+gradient = SubResource("Gradient_jt1pq")
+width = 16
+height = 16
+
+[sub_resource type="Gradient" id="Gradient_xq7rd"]
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0, 0, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_m63ko"]
+gradient = SubResource("Gradient_xq7rd")
+width = 16
+height = 16
+
+[node name="DemoHUD" type="PanelContainer"]
+offset_right = 295.0
+offset_bottom = 31.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_a3k8p")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="MenuButton" type="MenuButton" parent="HBoxContainer"]
+layout_mode = 2
+toggle_mode = false
+text = "Behavior Color Keys"
+item_count = 6
+popup/item_0/text = "Seek"
+popup/item_0/icon = ExtResource("1_44qwb")
+popup/item_0/id = 0
+popup/item_1/text = "Flee"
+popup/item_1/icon = ExtResource("2_7odxm")
+popup/item_1/id = 1
+popup/item_2/text = "Pursuit"
+popup/item_2/icon = ExtResource("3_ijx18")
+popup/item_2/id = 2
+popup/item_3/text = "Evasion"
+popup/item_3/icon = ExtResource("4_fj2af")
+popup/item_3/id = 3
+popup/item_4/text = "Offset Pursuit"
+popup/item_4/icon = ExtResource("5_32fiu")
+popup/item_4/id = 4
+popup/item_5/text = "Arrival"
+popup/item_5/icon = ExtResource("6_wsayf")
+popup/item_5/id = 5
+script = ExtResource("7_xf7wc")
+
+[node name="MenuButton2" type="MenuButton" parent="HBoxContainer"]
+layout_mode = 2
+toggle_mode = false
+text = "Character Vector Color Keys"
+item_count = 3
+popup/item_0/text = "Current Velocity"
+popup/item_0/icon = SubResource("GradientTexture2D_80q1w")
+popup/item_0/id = 0
+popup/item_1/text = "Desired Velocity"
+popup/item_1/icon = SubResource("GradientTexture2D_w704c")
+popup/item_1/id = 1
+popup/item_2/text = "Steering Velocity"
+popup/item_2/icon = SubResource("GradientTexture2D_m63ko")
+popup/item_2/id = 2
+script = ExtResource("7_xf7wc")
+
+[connection signal="pressed" from="HBoxContainer/MenuButton" to="HBoxContainer/MenuButton" method="_on_pressed"]
+[connection signal="pressed" from="HBoxContainer/MenuButton2" to="HBoxContainer/MenuButton2" method="_on_pressed"]

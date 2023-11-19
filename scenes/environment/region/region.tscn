@@ -1,0 +1,45 @@
+[gd_scene load_steps=4 format=3 uid="uid://c82anyrv7v5du"]
+
+[ext_resource type="Script" path="res://scenes/environment/region/region.gd" id="1_x1tjh"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jsv8f"]
+size = Vector2(320, 180)
+
+[sub_resource type="LabelSettings" id="LabelSettings_p0q7j"]
+
+[node name="Region" type="Area2D"]
+position = Vector2(168, 96)
+script = ExtResource("1_x1tjh")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_jsv8f")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 168.0
+offset_top = -88.0
+offset_right = 168.0
+offset_bottom = -88.0
+
+[node name="Label" type="Label" parent="Control"]
+layout_mode = 0
+offset_right = 99.0
+offset_bottom = 26.0
+text = "Region Label"
+label_settings = SubResource("LabelSettings_p0q7j")
+metadata/_edit_use_anchors_ = true
+
+[node name="Boids" type="Node2D" parent="."]
+
+[node name="Quarry" type="Node2D" parent="."]
+
+[node name="Stations" type="Node2D" parent="."]
+
+[node name="Obstacles" type="Node2D" parent="."]
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

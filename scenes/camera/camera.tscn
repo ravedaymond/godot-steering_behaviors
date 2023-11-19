@@ -10,6 +10,7 @@ ignore_rotation = false
 script = ExtResource("1_b5q6x")
 
 [node name="Area2D" type="Area2D" parent="."]
+visible = false
 collision_layer = 0
 collision_mask = 3
 

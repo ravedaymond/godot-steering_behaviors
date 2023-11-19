@@ -1,0 +1,57 @@
+[gd_scene load_steps=4 format=3 uid="uid://dbhxydwrn46h2"]
+
+[ext_resource type="PackedScene" uid="uid://8x2bngf2am7d" path="res://scenes/ui/modules/demo_hud/ui_demo_hud.tscn" id="2_4kc74"]
+[ext_resource type="PackedScene" uid="uid://r2734ygkngnh" path="res://scenes/ui/modules/main_menu/ui_main_menu.tscn" id="2_er5m2"]
+
+[sub_resource type="GDScript" id="GDScript_fvrv1"]
+script/source = "extends Node
+
+
+@onready var default_window_title = get_window().title
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	var item = load(\"res://scenes/ui/modules/main_menu/ui_main_menu_grid_item.tscn\")
+	var grid = get_node(\"CanvasLayer/MainMenu/MarginContainer/HBoxContainer/VBoxRight/PanelContainer/MarginContainer/GridContainer\") as GridContainer
+	if(grid):
+		for i in Global.Demos:
+			var demo = item.instantiate()
+			demo.get_node(\"MarginContainer/VBoxContainer/RichTextLabel\").text = \"[center]\"+str(Global.Demos.get(i))+\"[/center]\"
+			var img = load(\"res://assets/\"+str(i)+\".png\")
+			if(is_instance_valid(img)):
+				demo.get_node(\"MarginContainer/VBoxContainer/StaticContainer/Image\").texture = img
+			demo.set_meta(\"demo_scene\", load(\"res://demo/\"+str(i)+\"/\"+str(i)+\".tscn\"))
+			demo.set_meta(\"window_title\", str(Global.Demos.get(i)))
+			grid.add_child(demo)
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	if(Input.is_action_just_pressed(\"ui_cancel\")):
+		get_tree().reload_current_scene()
+		get_window().title = default_window_title
+
+
+func _on_main_menu_load_demo():
+	if(Global.DEMO_SELECTED):
+		print(\"Loading demo... \"+str(Global.DEMO_SELECTED))
+		$CanvasLayer/MainMenu.visible = false
+		get_window().title = Global.WINDOW_TITLE + str(\" @ravedaymond\")
+		$CanvasLayer/DemoHUD.visible = true
+#		$CanvasLayer/DemoHUD.set_mouse_filter(Control.MOUSE_FILTER_STOP)
+		add_child(Global.DEMO_SELECTED.instantiate())
+"
+
+[node name="Main" type="Node"]
+script = SubResource("GDScript_fvrv1")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="MainMenu" parent="CanvasLayer" instance=ExtResource("2_er5m2")]
+
+[node name="DemoHUD" parent="CanvasLayer" instance=ExtResource("2_4kc74")]
+visible = false
+
+[connection signal="load_demo" from="CanvasLayer/MainMenu" to="." method="_on_main_menu_load_demo"]

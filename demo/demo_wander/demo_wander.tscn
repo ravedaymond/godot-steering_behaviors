@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://cnpkm7qdmr780"]
+
+[ext_resource type="PackedScene" uid="uid://g4lwk5ek5jde" path="res://scenes/level/level.tscn" id="1_gdhuq"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_n0ewh"]
+
+[node name="Level" instance=ExtResource("1_gdhuq")]
+
+[node name="ButtonSelect" parent="CanvasLayer/Control/Container/MarginContainer/VBoxContainer/HBoxContainer" index="0"]
+button_group = SubResource("ButtonGroup_n0ewh")
+
+[node name="ButtonCreate" parent="CanvasLayer/Control/Container/MarginContainer/VBoxContainer/HBoxContainer" index="1"]
+button_group = SubResource("ButtonGroup_n0ewh")
+
+[node name="ButtonDelete" parent="CanvasLayer/Control/Container/MarginContainer/VBoxContainer/HBoxContainer" index="2"]
+button_group = SubResource("ButtonGroup_n0ewh")

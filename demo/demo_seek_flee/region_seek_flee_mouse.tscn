@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://dqf2s0fgwcwq3"]
+
+[ext_resource type="PackedScene" uid="uid://c82anyrv7v5du" path="res://scenes/environment/region/region.tscn" id="1_8qmev"]
+[ext_resource type="PackedScene" uid="uid://bttetwdvp3d27" path="res://scenes/characters/boids/boid.tscn" id="2_b8qwj"]
+
+[node name="RegionSeekFleeMouse" instance=ExtResource("1_8qmev")]
+
+[node name="Label" parent="Control" index="0"]
+text = "Seek or Flee using the mouse 
+as a target to get a better
+understanding of how the
+different vectors work together."
+
+[node name="Boid" parent="Boids" index="0" instance=ExtResource("2_b8qwj")]
+behavior = 1
+target_mouse = true

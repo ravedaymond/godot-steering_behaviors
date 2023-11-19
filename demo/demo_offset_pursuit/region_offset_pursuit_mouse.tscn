@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://c3defm7kswox2"]
+
+[ext_resource type="PackedScene" uid="uid://c82anyrv7v5du" path="res://scenes/environment/region/region.tscn" id="1_klxyp"]
+[ext_resource type="PackedScene" uid="uid://bttetwdvp3d27" path="res://scenes/characters/boids/boid.tscn" id="2_u6vx7"]
+
+[node name="RegionOffsetPursuitMouse" instance=ExtResource("1_klxyp")]
+
+[node name="Boid" parent="Boids" index="0" instance=ExtResource("2_u6vx7")]
+behavior = 5
+target_mouse = true

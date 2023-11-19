@@ -1,0 +1,32 @@
+[gd_scene load_steps=4 format=3 uid="uid://chr4sb7fj4eex"]
+
+[ext_resource type="PackedScene" uid="uid://c82anyrv7v5du" path="res://scenes/environment/region/region.tscn" id="1_3akks"]
+[ext_resource type="PackedScene" uid="uid://bttetwdvp3d27" path="res://scenes/characters/boids/boid.tscn" id="2_kujy1"]
+[ext_resource type="PackedScene" uid="uid://bgk0aqoulxw6j" path="res://scenes/characters/quarry/quarry.tscn" id="3_5kxif"]
+
+[node name="RegionPursuitEvasionQuarry" instance=ExtResource("1_3akks")]
+
+[node name="Label" parent="Control" index="0"]
+offset_right = 231.0
+offset_bottom = 130.0
+text = "Pursuit and Evasion instead
+calculates a future position
+based on the targets current
+velocity. This can be as simple
+or complex as you want."
+
+[node name="Boid" parent="Boids" index="0" instance=ExtResource("2_kujy1")]
+position = Vector2(-112, -32)
+behavior = 3
+target_quarry = true
+
+[node name="Quarry" parent="Quarry" index="0" instance=ExtResource("3_5kxif")]
+position = Vector2(-120, 56)
+starting_velocity = Vector2(1, 1)
+debug_draw_desatured = true
+
+[node name="Stations" parent="." index="4"]
+visible = false
+
+[node name="Obstacles" parent="." index="5"]
+visible = false

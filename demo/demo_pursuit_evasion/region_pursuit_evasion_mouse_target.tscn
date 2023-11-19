@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://b2wceva0llmjo"]
+
+[ext_resource type="PackedScene" uid="uid://c82anyrv7v5du" path="res://scenes/environment/region/region.tscn" id="1_8pxw4"]
+[ext_resource type="PackedScene" uid="uid://bttetwdvp3d27" path="res://scenes/characters/boids/boid.tscn" id="2_tqbes"]
+[ext_resource type="PackedScene" uid="uid://1qnup48711p4" path="res://scenes/characters/stations/station.tscn" id="3_1ikbt"]
+
+[node name="RegionPursuitEvasionMouseTarget" instance=ExtResource("1_8pxw4")]
+
+[node name="Label" parent="Control" index="0"]
+text = "Pursuit and Evasion of the mouse
+or a 'static' target is identical to 
+Seek and Flee as the mouse or the
+target has no velocity to calculate a 
+future position from."
+
+[node name="Boid" parent="Boids" index="0" instance=ExtResource("2_tqbes")]
+behavior = 3
+target_mouse = true
+
+[node name="Boid2" parent="Boids" index="1" instance=ExtResource("2_tqbes")]
+position = Vector2(88, -24)
+behavior = 3
+target_station = true
+
+[node name="Station" parent="Stations" index="0" instance=ExtResource("3_1ikbt")]
+position = Vector2(112, -48)
+station_color = 2

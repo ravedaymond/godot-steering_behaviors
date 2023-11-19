@@ -1,0 +1,17 @@
+[gd_scene load_steps=5 format=3 uid="uid://bgjcvpxlafmt7"]
+
+[ext_resource type="PackedScene" uid="uid://g4lwk5ek5jde" path="res://scenes/level/level.tscn" id="1_kntpn"]
+[ext_resource type="PackedScene" uid="uid://cm3a4ul78s255" path="res://demo/demo_pursuit_evasion/region_pursuit_evasion_compare.tscn" id="2_11exw"]
+[ext_resource type="PackedScene" uid="uid://b2wceva0llmjo" path="res://demo/demo_pursuit_evasion/region_pursuit_evasion_mouse_target.tscn" id="4_akj0r"]
+[ext_resource type="PackedScene" uid="uid://chr4sb7fj4eex" path="res://demo/demo_pursuit_evasion/region_pursuit_evasion_quarry.tscn" id="4_v578y"]
+
+[node name="demo_pursuit_evasion" instance=ExtResource("1_kntpn")]
+
+[node name="RegionPursuitEvasionQuarry" parent="Regions" index="0" instance=ExtResource("4_v578y")]
+position = Vector2(0, -192)
+
+[node name="RegionPursuitEvasionCompare" parent="Regions" index="1" instance=ExtResource("2_11exw")]
+position = Vector2(0, 192)
+
+[node name="RegionPursuitEvasionMouseTarget" parent="Regions" index="2" instance=ExtResource("4_akj0r")]
+position = Vector2(0, 0)

@@ -13,7 +13,7 @@ enum Behavior {
 	OBSTACLE_AVOIDANCE,
 	WANDER_RANDOM,
 	WANDER_REYNOLDS,
-	WANDER_EXPLORRE,
+	WANDER_EXPLORE,
 	WANDER_FORAGE,
 	PATH_FOLLOWING,
 	WALL_FOLLOWING,
@@ -36,15 +36,18 @@ enum Type {
 
 @export var behavior: Behavior = Behavior.STATIC
 @export var obstacle_avoidance: ObstacleAvoidance = ObstacleAvoidance.NONE
-@export var use_mouse_as_target: bool = false
+@export var target_mouse: bool = false
+@export var target_quarry: bool = false
+@export var target_station: bool = false
 @export var use_intervals: bool = false
+@export var starting_velocity: Vector2 = Vector2.ZERO
 @export var velocity_speed: float = 0.0
 @export var velocity_speed_max: float = 50.0
 @export var velocity_acceleration: float = 0.1
 var velocity_desired: Vector2 = Vector2.ZERO
 var velocity_steered: Vector2 = Vector2.ZERO
 @export var steering_force: float = 0.0
-@export var steering_force_max: float = 2.0
+@export_range(0.1, 5.0, 0.1) var steering_force_max: float = 2.0
 @export var steering_intensity: float = 0.01
 var steering_vector: Vector2 = Vector2.ZERO
 @export_subgroup("Pursue", "pursue_")
@@ -82,15 +85,16 @@ var wander_area: Vector2 = Vector2.ZERO
 var wander_target: Vector2 = Vector2.ZERO
 var wander_timer: Timer = add_wander_timer()
 @export_subgroup("Debugging", "debug_")
-@export var debug_enabled: bool = true
 @export var debug_draw_vectors: bool = true
+@export var debug_draw_desatured: bool = false
 @export var debug_draw_labels: bool = false
 
 var target: Node2D
 var type: Type
+var region: Area2D
 
 func _init():
-	add_to_group(Main.Groups.BOIDS)
+	add_to_group(Global.Groups.BOIDS)
 
 
 # Called when the node enters the scene tree for the first time.
@@ -98,13 +102,8 @@ func _ready():
 	if(!use_intervals):
 		velocity_speed = velocity_speed_max
 		steering_force = steering_force_max
-	if(behavior == Behavior.STATIC):
-#		var x = randf()*sign(randi_range(-1, 1))
-#		var y = randf()*sign(randi_range(-1, 1))
-#		velocity = Vector2(x, y).normalized()*velocity_speed_max
-		pass
-	elif(behavior == Behavior.OBSTACLE_AVOIDANCE):
-		velocity = Vector2(50, 0)
+	if(behavior in [Behavior.STATIC, Behavior.OBSTACLE_AVOIDANCE, ]):
+		velocity = starting_velocity.normalized() * velocity_speed
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
@@ -113,8 +112,8 @@ func _process(_delta):
 
 func _physics_process(_delta):
 	if(use_intervals && behavior != Behavior.STATIC):
-		velocity_speed = clampf(velocity_speed+velocity_acceleration, 0, velocity_speed_max)
-		steering_force = clampf(steering_force+steering_intensity, 0, steering_force_max)
+		velocity_speed = clampf(velocity_speed + velocity_acceleration, 0, velocity_speed_max)
+		steering_force = clampf(steering_force + steering_intensity, 0, steering_force_max)
 	decide_on_target()
 	match(behavior):
 		Behavior.SEEK:
@@ -144,7 +143,7 @@ func _physics_process(_delta):
 			velocity_steered += behavior_wander_reynolds(wander_interval)
 		_:
 			behavior = Behavior.STATIC
-	velocity += velocity_steered
+	velocity = (velocity+velocity_steered).limit_length(velocity_speed_max)
 	move_and_slide()
 	velocity_steered = Vector2.ZERO
 	
@@ -157,44 +156,73 @@ func _physics_process(_delta):
 
 func _draw():
 	if(!debug_draw_vectors): return
-	if(behavior in [Behavior.SEEK, Behavior.FLEE, Behavior.PURSUIT, Behavior.PURSUIT_OFFSET, Behavior.EVASION, Behavior.ARRIVAL, Behavior.WANDER_RANDOM, Behavior.OBSTACLE_AVOIDANCE, ]):
+	# Calculate shared draw values for debugging
+	var draw_origin = to_local(global_position)
+	var draw_v = velocity.rotated(-rotation)
+	var draw_vd = velocity_desired.rotated(-rotation)
+	var draw_sv = (velocity + steering_vector).rotated(-rotation)
+	var color_connection
+	var color_velocity
+	var color_desired
+	var color_steering
+	if(debug_draw_desatured):
+		color_connection = Color.DARK_SLATE_GRAY
+		color_velocity = Color.DARK_GREEN
+		color_desired = Color.DARK_RED
+		color_steering = Color.DARK_BLUE
+	else:
+		color_connection = Color.DIM_GRAY
+		color_velocity = Color.GREEN
+		color_desired = Color.RED
+		color_steering = Color.BLUE
+
+	if(behavior in [
+		Behavior.SEEK, 
+		Behavior.FLEE, 
+		Behavior.PURSUIT, 
+		Behavior.EVASION, 
+		Behavior.PURSUIT_OFFSET, 
+		Behavior.ARRIVAL, 
+		Behavior.WANDER_RANDOM, 
+	]):
 		if(target):
 			if(behavior == Behavior.PURSUIT):
-				draw_line(Vector2.ZERO, to_local(pursuit_vector), Color.DIM_GRAY, 1.0, false)
-			if(behavior == Behavior.EVASION):
-				draw_line(Vector2.ZERO, to_local(evasion_vector), Color.DIM_GRAY, 1.0, false)
-			if(behavior == Behavior.PURSUIT_OFFSET):
-				draw_line(to_local(pursuit_vector), to_local(pursuit_vector_offset), Color.DIM_GRAY, 1.0, false)
-				draw_line(Vector2.ZERO, to_local(pursuit_vector_offset), Color.DIM_GRAY, 1.0, false)
-			if(obstacle_avoidance == ObstacleAvoidance.AREA2D):
-				if(avoidance_target):
-					draw_line(Vector2.ZERO, to_local(avoidance_target.global_position), Color.DIM_GRAY, 1.0, false)
+				draw_line(draw_origin, to_local(pursuit_vector), color_connection, -1.0, false)
+			elif(behavior == Behavior.EVASION):
+				draw_line(draw_origin, to_local(pursuit_vector), color_connection, -1.0, false)
+			elif(behavior == Behavior.PURSUIT_OFFSET):
+				draw_line(draw_origin, to_local(pursuit_vector), color_connection, -1.0, false)
 			else:
-				draw_line(Vector2.ZERO, to_local(target.global_position), Color.DIM_GRAY, 1.0, false)
-		draw_line(velocity.rotated(-rotation), velocity_desired.rotated(-rotation), Color.DIM_GRAY, 1.0, false)
-		draw_line(Vector2.ZERO, velocity_desired.rotated(-rotation), Color.RED, 1.0, false)
-		draw_line(velocity.rotated(-rotation), (velocity+steering_vector).rotated(-rotation), Color.MEDIUM_BLUE, 1.0, false)
-		draw_line(Vector2.ZERO, velocity.rotated(-rotation), Color.DARK_GREEN, 1.0, false)
-	elif(obstacle_avoidance in [ObstacleAvoidance.RAYCAST, ]):
-		draw_arc(to_local(avoidance_left_position), 1, 0, 360, 25, Color.DIM_GRAY, 1.0, false)
-		draw_arc(to_local(avoidance_right_position), 1, 0, 360, 25, Color.DIM_GRAY, 1.0, false)
-		draw_arc(to_local(avoidance_left_vector), 1, 0, 360, 25, Color.DIM_GRAY, 1.0, false)
-		draw_arc(to_local(avoidance_right_vector), 1, 0, 360, 25, Color.DIM_GRAY, 1.0, false)
-		draw_arc(to_local(avoidance_center_vector), 1, 0, 360, 25, Color.DIM_GRAY, 1.0, false)
-		draw_line(to_local(avoidance_left_position), to_local(avoidance_left_vector), Color.DIM_GRAY, 1.0, false)
-		draw_line(to_local(avoidance_right_position), to_local(avoidance_right_vector), Color.DIM_GRAY, 1.0, false)
-		draw_line(to_local(global_position), to_local(avoidance_center_vector), Color.DIM_GRAY, 1.0, false)
-		draw_line(Vector2.ZERO, velocity.rotated(-rotation), Color.DIM_GRAY, 1.0, false)
-	elif(behavior in [Behavior.WANDER_REYNOLDS, ]):
-		draw_circle(to_local(wander_area), wander_strength, Color.DIM_GRAY)
-		draw_line(Vector2.ZERO, to_local(wander_target), Color.RED, 1.0, false)
-		draw_line(to_local(wander_area), to_local(wander_target), Color.RED, 1.0, false)
-		draw_arc(to_local(wander_target), 1, 0, 360, 25, Color.RED, 1.0, false)
-		draw_line(velocity.rotated(-rotation), velocity_desired.rotated(-rotation), Color.DIM_GRAY, 1.0, false)
-#		draw_line(Vector2.ZERO, velocity_desired.rotated(-rotation), Color.RED, 1.0, false)
-		draw_line(velocity.rotated(rotation), (velocity+steering_vector).rotated(-rotation), Color.MEDIUM_BLUE, 1.0, false)
-		draw_line(Vector2.ZERO, velocity.rotated(rotation), Color.DARK_GREEN, 1.0, false)
-
+				draw_line(draw_origin, to_local(target.global_position), color_connection, -1.0, false)
+	elif(behavior == Behavior.WANDER_REYNOLDS):
+		draw_circle(to_local(wander_area), wander_strength, color_connection)
+		draw_line(draw_origin, to_local(wander_target), Color.YELLOW, 1.0, false)
+		draw_line(to_local(wander_area), to_local(wander_target), Color.YELLOW, 1.0, false)
+		draw_arc(to_local(wander_target), 1, 0, 360, 25, Color.YELLOW, 1.0, false)
+		pass
+	# Obstacle Avoidance Debugging
+	if(obstacle_avoidance == ObstacleAvoidance.RAYCAST):
+		draw_arc(to_local(avoidance_left_position), 1, 0, 360, 25, color_connection, 1.0, false)
+		draw_arc(to_local(avoidance_right_position), 1, 0, 360, 25, color_connection, 1.0, false)
+		draw_arc(to_local(avoidance_left_vector), 1, 0, 360, 25, color_connection, 1.0, false)
+		draw_arc(to_local(avoidance_right_vector), 1, 0, 360, 25, color_connection, 1.0, false)
+		draw_arc(to_local(avoidance_center_vector), 1, 0, 360, 25, color_connection, 1.0, false)
+		draw_line(to_local(avoidance_left_position), to_local(avoidance_left_vector), color_connection, 1.0, false)
+		draw_line(to_local(avoidance_right_position), to_local(avoidance_right_vector), color_connection, 1.0, false)
+		draw_line(to_local(global_position), to_local(avoidance_center_vector), color_connection, 1.0, false)
+	elif(obstacle_avoidance == ObstacleAvoidance.AREA2D):
+		if(avoidance_target):
+			draw_line(draw_origin, to_local(avoidance_target.global_position), color_connection, 1.0, false)
+	# Draw velocity_desired markers
+	draw_line(draw_v, draw_vd, color_connection, -1.0, false)
+	draw_circle(draw_vd, 1, color_desired)
+	draw_line(draw_origin, draw_vd, color_desired, -1.0, false)
+	# Draw steering_vector markers
+	draw_circle(draw_sv, 1, color_steering) # How to draw this circle at a given force % distance from v to vd
+	draw_line(draw_v, draw_sv, color_steering, -1.0, false)
+	# Draw velocity markers
+	draw_circle(draw_v, 1, color_velocity)
+	draw_line(draw_origin, draw_v, color_velocity, -1.0, false)
 
 
 func debug_labels(rotval: float):
@@ -213,23 +241,25 @@ func debug_labels(rotval: float):
 
 
 func decide_on_target():
+	if(behavior in [Behavior.WANDER_RANDOM, Behavior.WANDER_REYNOLDS, ]): 
+		return
 	if(!is_instance_valid(target)):
 		target = Node2D.new()
 		target.global_position = global_position
-	if(behavior == Behavior.WANDER_RANDOM || behavior == Behavior.WANDER_REYNOLDS): return
-	if(use_mouse_as_target):
+	if(!is_instance_valid(region)): return
+	if(target_mouse && region.mouse_in_region):
 		target.global_position = get_global_mouse_position()
 		return
-	var group = Main.LEVEL.get_node(Main.Groups.QUARRY)
-	if(group.get_child_count() > 0):
-		target = group.get_child(0)
-		return
-	group = Main.LEVEL.get_node(Main.Groups.BEACONS)
-	if(group.get_child_count() > 0):
-		for i in group.get_children():
-			if i.type == Beacon.Type.ATTRACTOR:
-				target = i
-				return
+	if(target_quarry):
+		var group = region.groups.get(Global.Groups.QUARRY)
+		if(group.size() > 0):
+			target = group[0]
+			return
+	if(target_station):
+		var group = region.groups.get(Global.Groups.STATIONS)
+		if(group.size() > 0):
+			target = group[0]
+			return
 
 
 # Apply steering force towards a direct path to the target.
@@ -248,7 +278,7 @@ func behavior_seek(seek_position: Vector2) -> Vector2:
 
 # Apply steering force towards a direct path away from the target.
 func behavior_flee(flee_position: Vector2) -> Vector2:
-	velocity_desired = (global_position - flee_position).limit_length(velocity_speed)
+	velocity_desired = (global_position - flee_position).normalized()*velocity_speed
 	steering_vector = (velocity_desired - velocity).limit_length(steering_force)
 	return steering_vector
 

@@ -1,0 +1,30 @@
+[gd_scene load_steps=4 format=3 uid="uid://cm3a4ul78s255"]
+
+[ext_resource type="PackedScene" uid="uid://c82anyrv7v5du" path="res://scenes/environment/region/region.tscn" id="1_tri8l"]
+[ext_resource type="PackedScene" uid="uid://bttetwdvp3d27" path="res://scenes/characters/boids/boid.tscn" id="2_qm5aa"]
+[ext_resource type="PackedScene" uid="uid://bgk0aqoulxw6j" path="res://scenes/characters/quarry/quarry.tscn" id="3_1bo5x"]
+
+[node name="RegionPursuitEvasionCompare" instance=ExtResource("1_tri8l")]
+
+[node name="Label" parent="Control" index="0"]
+text = "Pursuit and Evasion is able to catch
+a faster 'quarry' when compared to 
+Seek and Flee.
+
+"
+
+[node name="Boid" parent="Boids" index="0" instance=ExtResource("2_qm5aa")]
+position = Vector2(-16, -8)
+behavior = 1
+target_quarry = true
+
+[node name="Boid2" parent="Boids" index="1" instance=ExtResource("2_qm5aa")]
+position = Vector2(16, 8)
+behavior = 3
+target_quarry = true
+
+[node name="Quarry" parent="Quarry" index="0" instance=ExtResource("3_1bo5x")]
+position = Vector2(-104, 32)
+starting_velocity = Vector2(1, 1)
+velocity_speed_max = 100.0
+debug_draw_desatured = true

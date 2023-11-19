@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3 uid="uid://ba3f537aqiw5i"]
+
+[sub_resource type="GDScript" id="GDScript_3642p"]
+script/source = "extends Container
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	var child = get_child(0) as Control
+	fit_child_in_rect(child, Rect2(position, custom_minimum_size))
+
+"
+
+[node name="StaticContainer" type="Container"]
+clip_contents = true
+mouse_filter = 2
+script = SubResource("GDScript_3642p")

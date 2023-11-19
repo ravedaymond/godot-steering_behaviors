@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://b7gt3vrkyijwv"]
+
+[ext_resource type="PackedScene" uid="uid://c82anyrv7v5du" path="res://scenes/environment/region/region.tscn" id="1_pvi63"]
+[ext_resource type="PackedScene" uid="uid://bttetwdvp3d27" path="res://scenes/characters/boids/boid.tscn" id="2_x8htk"]
+[ext_resource type="PackedScene" uid="uid://bgk0aqoulxw6j" path="res://scenes/characters/quarry/quarry.tscn" id="3_m6305"]
+
+[node name="RegionSeekFleeQuarry" instance=ExtResource("1_pvi63")]
+
+[node name="Label" parent="Control" index="0"]
+text = "Seek or Flee a target or 'quarry'
+simply follows that objects
+current global position at each
+frame."
+
+[node name="Boid" parent="Boids" index="0" instance=ExtResource("2_x8htk")]
+position = Vector2(96, 0)
+behavior = 1
+target_quarry = true
+
+[node name="Quarry" parent="Quarry" index="0" instance=ExtResource("3_m6305")]
+position = Vector2(-104, 0)
+starting_velocity = Vector2(1, 1)
+debug_enabled = null
+debug_draw_vectors = false

@@ -1,0 +1,131 @@
+[gd_scene load_steps=3 format=3 uid="uid://r2734ygkngnh"]
+
+[sub_resource type="GDScript" id="GDScript_uhif3"]
+script/source = "extends PanelContainer
+
+
+func _process(_delta):
+	if(Global.DEMO_SELECTED):
+		$MarginContainer/HBoxContainer/VBoxRight/HBoxContainer/LoadDemoButton.disabled = false
+	else:
+		$MarginContainer/HBoxContainer/VBoxRight/HBoxContainer/LoadDemoButton.disabled = true
+
+
+func _on_load_demo_button_pressed():
+	Main.load_demo()
+"
+
+[sub_resource type="LabelSettings" id="LabelSettings_8lo5a"]
+font_size = 32
+
+[node name="MainMenu" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_uhif3")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxLeft" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="MarginContainer" parent="MarginContainer/HBoxContainer/VBoxLeft"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxLeft/Title"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxLeft/Title/VBoxContainer"]
+layout_mode = 2
+text = "Steering Behaviors"
+label_settings = SubResource("LabelSettings_8lo5a")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer/HBoxContainer/VBoxLeft/Title/VBoxContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "by [url=\"https://github.com/ravedaymond\"]@ravedaymond[/url]"
+fit_content = true
+
+[node name="Description" type="MarginContainer" parent="MarginContainer/HBoxContainer/VBoxLeft"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer/HBoxContainer/VBoxLeft/Description"]
+layout_mode = 2
+bbcode_enabled = true
+text = "A study of [url=\"https://www.red3d.com/cwr/\"]Craig Reynolds[/url]' research paper, [url=\"https://www.red3d.com/cwr/papers/1999/gdc99steer.html\"][i]Steering Behaviors for Autonomous Characters[/i] ©1999[/url], implemented in the [url=\"https://godotengine.org/\"]Godot Engine[/url] using [url=\"https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/index.html\"]GDScript[/url]."
+fit_content = true
+
+[node name="References" type="MarginContainer" parent="MarginContainer/HBoxContainer/VBoxLeft"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxLeft/References"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxLeft/References/VBoxContainer"]
+layout_mode = 2
+text = "Additional References"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer/HBoxContainer/VBoxLeft/References/VBoxContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[url=\"https://godot.foundation/\"]Godot Foundation[/url]"
+fit_content = true
+
+[node name="VBoxRight" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/VBoxRight"]
+layout_mode = 2
+text = "Behavior Demos"
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer/HBoxContainer/VBoxRight"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/VBoxRight/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/HBoxContainer/VBoxRight/PanelContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxRight"]
+layout_mode = 2
+
+[node name="LoadDemoButton" type="Button" parent="MarginContainer/HBoxContainer/VBoxRight/HBoxContainer"]
+layout_mode = 2
+text = "LOAD SELECTED DEMO"
+
+[node name="LoadSandboxButton" type="Button" parent="MarginContainer/HBoxContainer/VBoxRight/HBoxContainer"]
+layout_mode = 2
+disabled = true
+text = "START SANDBOX"
+
+[connection signal="pressed" from="MarginContainer/HBoxContainer/VBoxRight/HBoxContainer/LoadDemoButton" to="." method="_on_load_demo_button_pressed"]

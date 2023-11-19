@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://brkcy6ciidb3s"]
+
+[ext_resource type="PackedScene" uid="uid://g4lwk5ek5jde" path="res://scenes/level/level.tscn" id="1_ddecs"]
+[ext_resource type="PackedScene" uid="uid://gtobukrufr0" path="res://demo/demo_seek_flee/region_seek_flee_target.tscn" id="2_cwm00"]
+[ext_resource type="PackedScene" uid="uid://b7gt3vrkyijwv" path="res://demo/demo_seek_flee/region_seek_flee_quarry.tscn" id="3_mee52"]
+[ext_resource type="PackedScene" uid="uid://dqf2s0fgwcwq3" path="res://demo/demo_seek_flee/region_seek_flee_mouse.tscn" id="4_7v022"]
+
+[node name="demo_seek_flee" instance=ExtResource("1_ddecs")]
+demo_level_info = {
+"Arrival": false,
+"Evasion": false,
+"Flee": true,
+"OffsetPursuit": false,
+"Pursuit": false,
+"Seek": true,
+"Static": false
+}
+
+[node name="RegionSeekFleeTarget" parent="Regions" index="0" instance=ExtResource("2_cwm00")]
+position = Vector2(0, -192)
+
+[node name="RegionSeekFleeQuarry" parent="Regions" index="1" instance=ExtResource("3_mee52")]
+position = Vector2(0, 192)
+
+[node name="RegionSeekFleeMouse" parent="Regions" index="2" instance=ExtResource("4_7v022")]
+position = Vector2(0, 0)
